@@ -1,0 +1,22 @@
+﻿@using System.Net.Http
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Web
+@using Microsoft.JSInterop
+@using FriendsForever_App
+@using FriendsForever_App.Shared
+@using Syncfusion.Blazor
+@using Syncfusion.Blazor.Calendars
+@using Syncfusion.Blazor.Buttons
+@using Syncfusion.Blazor.Grids
+@using Syncfusion.Blazor.Inputs 
+@using FriendsForever_App.Auth
+@using FriendsForever_Library.ViewModels
+@using FriendsForever_Library.Models
+@using FriendsForever_App.Services
+
+@inject NavigationManager navigationManager
+@inject CaptchaService captchaService
+@inject IJSRuntime jS

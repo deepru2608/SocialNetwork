@@ -1,0 +1,149 @@
+﻿@layout AccountLayout
+@page "/"
+@inject ILoginService loginService
+
+<div class="page-wrapper">
+    <div class="mx-auto login">
+        <div class="user-registerbox">
+            <h3>Login in to Your Account</h3>
+            <div class="registerbox-content">
+                <EditForm Model="loginModel" OnValidSubmit="LoginUser">
+                    <DataAnnotationsValidator />
+                    <div class="row">
+                        <div class="col-sm-12 col-md-12 col-lg-12">
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <SfTextBox CssClass="e-outline" Placeholder="Username" FloatLabelType="@FloatLabelType.Auto"
+                                               @bind-Value="loginModel.Username"></SfTextBox>
+                                    <ValidationMessage For="@(() => loginModel.Username)" />
+                                </div>
+                            </div>
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <SfTextBox CssClass="e-outline" Placeholder="Password" FloatLabelType="@FloatLabelType.Auto"
+                                               @bind-Value="loginModel.Password" Type="password"></SfTextBox>
+                                    <ValidationMessage For="@(() => loginModel.Password)" />
+                                </div>
+                            </div>
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <ReCAPTCHA @ref="reCAPTCHAComponent" SiteKey="6Lcz8uQUAAAAAMl5mtZeajPit7f6yBgqNt3uq4fE"
+                                               OnSuccess="OnSuccess" OnExpired="OnExpired" />
+                                </div>
+                            </div>
+                            <div class="col-sm-12">
+                                <div class="form-group">
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" id="chk" class="custom-control-input" @bind-value="loginModel.RememberMe">
+                                        <label class="custom-control-label" for="chk">Remember Me</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row text-center">
+                                <div class="col-sm-4">
+                                    <SfButton IsPrimary="true">
+                                        <i class="fas fa-sign-in-alt"></i>&nbsp;Sign in
+                                    </SfButton>
+                                    &nbsp;<img src="Images/BlockLoader.gif" style="height: 30px; width: 30px; display: @Loader" />
+                                </div>
+                                <div class="col-sm-4 pt-2">
+                                    <strong><a href="#" data-toggle="modal" data-target="#staticBackdrop" style="color: #3C40C6">Forgot Password</a> </strong>
+                                </div>
+                            </div>
+                            <div class="form-group row text-center">
+                                <div class="col-md-6 col-lg-12">
+                                    Don't have an account !
+                                    <strong><a href="Account/Register" style="color: #3C40C6">Sign Up Here</a></strong>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    </div>
+    <!-- scroll to top  -->
+    <a href="#" class="scroll-top" style="display:none;"></a>
+    <!-- end of scroll to top -->
+</div>
+
+@code {
+    public ReCAPTCHA reCAPTCHAComponent;
+    public bool ValidReCAPTCHA = false;
+
+    public LoginViewModel loginModel { get; set; }
+    public string Loader { get; set; }
+
+    public bool ServerVerificatiing = false;
+
+    public bool DisablePostButton => !ValidReCAPTCHA || ServerVerificatiing;
+
+    protected void OnSuccess()
+    {
+        ValidReCAPTCHA = true;
+    }
+
+    protected void OnExpired()
+    {
+        ValidReCAPTCHA = false;
+    }
+
+    protected override void OnInitialized()
+    {
+        loginModel = new LoginViewModel();
+        Loader = "none";
+    }
+
+    protected async Task LoginUser()
+    {
+        if (ValidReCAPTCHA)
+        {
+            var response = await reCAPTCHAComponent.GetResponseAsync();
+            try
+            {
+                Loader = "inline";
+                ServerVerificatiing = true;
+                StateHasChanged();
+                SampleAPIArgs args = new SampleAPIArgs
+                {
+                    reCAPTCHAResponse = response
+                };
+                var captchaResponse = await captchaService.GetCaptchaVerification(args);
+                if (captchaResponse == "success")
+                {
+                    //var userToken = await userService.LoginUserAsync(loginModel);
+                    var userToken = new UserToken
+                    {
+                        Token = "v8s4vg89erdf",
+                        Status = "success",
+                        Expiration = DateTime.Now
+                    };
+                    if (userToken.Status.ToLower() == "success")
+                    {
+                        await loginService.Login(userToken.Token);
+                        Loader = "none";
+                        navigationManager.NavigateTo("/", true);
+                    }
+                    else
+                    {
+                        await jS.ShowAlert(userToken.Status);
+                        Loader = "none";
+                        navigationManager.NavigateTo("Account/Login", true);
+                    }
+                }
+                else
+                {
+                    await jS.ShowAlert("Captcha has been expired, please reload the page!");
+                    navigationManager.NavigateTo("Account/Login", true);
+                }
+            }
+            catch (HttpRequestException e)
+            {
+                Loader = "none";
+                await jS.ShowAlert(e.Message + " or Reload the page!");
+                ServerVerificatiing = false;
+                navigationManager.NavigateTo("Account/Login", true);
+            }
+        }
+    }
+}
