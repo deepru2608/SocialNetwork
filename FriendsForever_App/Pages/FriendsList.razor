@@ -1,0 +1,72 @@
+﻿<style>
+    .customHoverEffect {
+        padding: 10px;
+        margin-bottom: -10px;
+    }
+
+        .customHoverEffect:hover {
+            background-color: #EAF0F1;
+            padding: 10px;
+            margin-bottom: -10px;
+            border-radius: 2px;
+            color: #4834DF;
+        }
+
+    .fixed-content {
+        top: 0;
+        bottom: 0;
+        position: relative;
+        overflow-y: scroll;
+        overflow-x: hidden;
+        max-height: 300px;
+    }
+</style>
+
+<!-- Card Narrower -->
+<div class="card card-cascade">
+    <!-- Card content -->
+    <div class="card-body card-body-cascade fixed-content">
+        <p style="padding-top: 2px; font-size: 18px" class="text-primary text-center border-bottom">Friends List</p>
+        @if (FriendsListAll.Any())
+        {
+            foreach (var friends in FriendsListAll)
+            {
+                var photoData = (friends.ProfilePhotoPath ?? "Microsoft_Default.png");
+                <div class="pb-2">
+                    <div class="customHoverEffect">
+                        <a class="friendListA" @onclick="(e => ViewFriendProfile(friends.EncryptFullName))">
+                            <p>
+                                <img src="/Images/ProfileImage/@photoData" alt="Avatar"
+                                     class="rounded-circle" style="width: 35px;height: 35px;">&nbsp;
+                                <span style="font-size: 12px;">@friends.FriendFullName</span>
+                            </p>
+                        </a>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+@code {
+    public IEnumerable<ShowAllFriend> FriendsListAll = new List<ShowAllFriend>();
+    private IDataProtector dataProtector;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = await userService.GetUserDetailsAsync();
+        dataProtector = dataProtectionProvider.CreateProtector(dataProtectionPurposeStrings.RouteValue);
+        FriendsListAll = await centerService.GetAllFriendsAsync(user.Id);
+        foreach (var item in FriendsListAll)
+        {
+            string encFullName = dataProtector.Protect(item.FriendFullName);
+            item.EncryptFullName = encFullName;
+        }
+    }
+
+    private void ViewFriendProfile(string encName)
+    {
+        string UriPath = $"/Home/FriendsViewProfile?encName={encName}";
+        navigationManager.NavigateTo(UriPath, true);
+    }
+}

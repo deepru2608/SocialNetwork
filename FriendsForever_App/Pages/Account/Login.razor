@@ -1,12 +1,24 @@
 ﻿@layout AccountLayout
-@page "/"
+@page "/Login"
 @inject ILoginService loginService
-
-<div class="page-wrapper">
-    <div class="mx-auto login">
-        <div class="user-registerbox">
-            <h3>Login in to Your Account</h3>
-            <div class="registerbox-content">
+<!-- Card Regular -->
+<div class="card card-cascade" style="margin-top: 30px; margin-left: 60px; margin-right: 60px">
+    <div class="row">
+        <div class="col-md-6 d-none d-sm-none d-md-block">
+            <!-- Card image -->
+            <div class="view view-cascade overlay">
+                <img class="card-img-top img-fluid" style="background-size: cover; max-height:700px" 
+                     src="https://source.unsplash.com/K4mSJ7kc0As/600x800" alt="Card image cap">
+                <a>
+                    <div class="mask rgba-white-slight"></div>
+                </a>
+            </div>
+        </div>
+        <div class="col-md-6 col-sm-12">
+            <!-- Card content -->
+            <div class="card-body card-body-cascade">
+                <!-- Title -->
+                <h4 class="card-title text-center"><strong class="border-bottom">Friends Forever Login</strong></h4>
                 <EditForm Model="loginModel" OnValidSubmit="LoginUser">
                     <DataAnnotationsValidator />
                     <div class="row">
@@ -15,14 +27,14 @@
                                 <div class="form-group">
                                     <SfTextBox CssClass="e-outline" Placeholder="Username" FloatLabelType="@FloatLabelType.Auto"
                                                @bind-Value="loginModel.Username"></SfTextBox>
-                                    <ValidationMessage For="@(() => loginModel.Username)" />
+                                    <ValidationMessage For="@(() => loginModel.Username)" style="color: red" />
                                 </div>
                             </div>
                             <div class="col-sm-12">
                                 <div class="form-group">
                                     <SfTextBox CssClass="e-outline" Placeholder="Password" FloatLabelType="@FloatLabelType.Auto"
                                                @bind-Value="loginModel.Password" Type="password"></SfTextBox>
-                                    <ValidationMessage For="@(() => loginModel.Password)" />
+                                    <ValidationMessage For="@(() => loginModel.Password)" style="color: red" />
                                 </div>
                             </div>
                             <div class="col-sm-12">
@@ -39,21 +51,20 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="form-group row text-center">
-                                <div class="col-sm-4">
+                            <div class="col-sm-12 text-center mt-3">
+                                <div class="pb-3">
                                     <SfButton IsPrimary="true">
                                         <i class="fas fa-sign-in-alt"></i>&nbsp;Sign in
                                     </SfButton>
                                     &nbsp;<img src="Images/BlockLoader.gif" style="height: 30px; width: 30px; display: @Loader" />
+                                    <br />
                                 </div>
-                                <div class="col-sm-4 pt-2">
-                                    <strong><a href="#" data-toggle="modal" data-target="#staticBackdrop" style="color: #3C40C6">Forgot Password</a> </strong>
-                                </div>
+                                <strong><a href="#" data-toggle="modal" data-target="#staticBackdrop" style="color: #3C40C6">Forgot Password</a> </strong>
                             </div>
-                            <div class="form-group row text-center">
+                            <div class="form-group row text-center mt-3">
                                 <div class="col-md-6 col-lg-12">
                                     Don't have an account !
-                                    <strong><a href="Account/Register" style="color: #3C40C6">Sign Up Here</a></strong>
+                                    <strong><a href="Register" style="color: #3C40C6">Sign Up Here</a></strong>
                                 </div>
                             </div>
                         </div>
@@ -62,10 +73,8 @@
             </div>
         </div>
     </div>
-    <!-- scroll to top  -->
-    <a href="#" class="scroll-top" style="display:none;"></a>
-    <!-- end of scroll to top -->
 </div>
+<!-- Card Regular -->
 
 @code {
     public ReCAPTCHA reCAPTCHAComponent;
@@ -111,13 +120,7 @@
                 var captchaResponse = await captchaService.GetCaptchaVerification(args);
                 if (captchaResponse == "success")
                 {
-                    //var userToken = await userService.LoginUserAsync(loginModel);
-                    var userToken = new UserToken
-                    {
-                        Token = "v8s4vg89erdf",
-                        Status = "success",
-                        Expiration = DateTime.Now
-                    };
+                    var userToken = await userService.LoginUserAsync(loginModel);
                     if (userToken.Status.ToLower() == "success")
                     {
                         await loginService.Login(userToken.Token);
@@ -128,13 +131,13 @@
                     {
                         await jS.ShowAlert(userToken.Status);
                         Loader = "none";
-                        navigationManager.NavigateTo("Account/Login", true);
+                        navigationManager.NavigateTo("Login", true);
                     }
                 }
                 else
                 {
                     await jS.ShowAlert("Captcha has been expired, please reload the page!");
-                    navigationManager.NavigateTo("Account/Login", true);
+                    navigationManager.NavigateTo("Login", true);
                 }
             }
             catch (HttpRequestException e)
@@ -142,7 +145,7 @@
                 Loader = "none";
                 await jS.ShowAlert(e.Message + " or Reload the page!");
                 ServerVerificatiing = false;
-                navigationManager.NavigateTo("Account/Login", true);
+                navigationManager.NavigateTo("Login", true);
             }
         }
     }

@@ -1,0 +1,147 @@
+﻿<style>
+    .customHoverEffect {
+        padding: 10px;
+        margin-bottom: -10px;
+    }
+
+        .customHoverEffect:hover {
+            background-color: #EAF0F1;
+            padding: 10px;
+            margin-bottom: -10px;
+            border-radius: 2px;
+            color: #4834DF;
+        }
+
+    .fixed-content {
+        top: 0;
+        bottom: 0;
+        position: relative;
+        overflow-y: scroll;
+        overflow-x: hidden;
+        max-height: 300px;
+    }
+</style>
+
+<!-- Card Narrower -->
+<div class="card card-cascade">
+    <!-- Card content -->
+    <div class="card-body card-body-cascade fixed-content">
+        <p style="padding-top: 2px; font-size: 18px" class="text-primary text-center border-bottom">Friends Request</p>
+        @if (NewFriendsRequest.Any())
+        {
+            foreach (var friends in NewFriendsRequest)
+            {
+                var photoData = (friends.ProfilePhotoPath ?? "Microsoft_Default.png");
+                <div class="pb-2">
+                    <div class="customHoverEffect">
+                        <p>
+                            <img src="/Images/ProfileImage/@photoData" alt="Avatar"
+                                 class="rounded-circle" style="width: 35px;height: 35px;">&nbsp;<span style="font-size: 13px;">Deepanshu</span>
+                        </p>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <SfButton IsPrimary="true" Content="Accept" OnClick="(e => AcceptFriendRequest(friends.EncryptFullName))"></SfButton>
+                            </div>
+                            <div class="col-md-6">
+                                <SfButton IsPrimary="true" Content="Reject" OnClick="(e => RejectFriendRequest(friends.EncryptFullName))"></SfButton>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+@code {
+    public IEnumerable<ShowFriendsReuqestData> NewFriendsRequest = new List<ShowFriendsReuqestData>();
+    private IDataProtector dataProtector;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var user = await userService.GetUserDetailsAsync();
+        dataProtector = dataProtectionProvider.CreateProtector(dataProtectionPurposeStrings.RouteValue);
+        NewFriendsRequest = await centerService.GetNewFriendsRequestAsync(user.Id);
+        foreach (var item in NewFriendsRequest)
+        {
+            string encFullName = dataProtector.Protect(item.SenderFullName);
+            item.EncryptFullName = encFullName;
+        }
+    }
+
+    protected async Task AcceptFriendRequest(string encName)
+    {
+        string FullName = string.Empty;
+        if (encName != null)
+        {
+            FullName = dataProtector.Unprotect(encName);
+        }
+        var friendSenderUser = await userService.GetUserByNameAsync(FullName);
+        var friendRequestUser = await userService.GetUserDetailsAsync();
+        if (friendSenderUser != null)
+        {
+            Friends friend = new Friends
+            {
+                Status = "Accept",
+                UserIdRequest = friendSenderUser.Id
+            };
+            var updateResult = await centerService.AcceptRejectRequestUpdateAsync(friend);
+            if (updateResult > 0)
+            {
+                Friends friends = new Friends
+                {
+                    UserIdRequest = friendRequestUser.Id,
+                    UserIdResponse = friendSenderUser.Id,
+                    Time_Stamp = DateTime.Now,
+                    UniqueId = Guid.NewGuid().ToString().GetHashCode().ToString("x"),
+                    Status = "Accept"
+                };
+
+                var result = await centerService.InsertFriendsReuqestDataAsync(friends);
+                if (result > 0)
+                {
+                    string message = $"You have accepted {friendRequestUser.FullName} request succesfully.";
+                    await jS.ShowAlert("Well Done!", message, SweetAlertMessageType.success);
+                    navigationManager.NavigateTo("/", true);
+                }
+                else
+                {
+                    string message = "We are facing some technical issue, please try again later!";
+                    await jS.ShowAlert("Oops!", message, SweetAlertMessageType.error);
+                    navigationManager.NavigateTo("/", true);
+                }
+            }
+        }
+    }
+
+    protected async Task RejectFriendRequest(string encName)
+    {
+        string FullName = string.Empty;
+        if (encName != null)
+        {
+            FullName = dataProtector.Unprotect(encName);
+        }
+        var friendSenderUser = await userService.GetUserByNameAsync(FullName);
+        if (friendSenderUser != null)
+        {
+            Friends friend = new Friends
+            {
+                Status = "Reject",
+                UserIdRequest = friendSenderUser.Id
+            };
+            var result = await centerService.AcceptRejectRequestUpdateAsync(friend);
+            if (result > 0)
+            {
+                string message = $"You have rejected {friendSenderUser.FullName} request succesfully.";
+                await jS.ShowAlert("Well Done!", message, SweetAlertMessageType.success);
+                navigationManager.NavigateTo("/", true);
+            }
+            else
+            {
+                string message = "We are facing some technical issue, please try again later!";
+                await jS.ShowAlert("Oops!", message, SweetAlertMessageType.error);
+                navigationManager.NavigateTo("/", true);
+            }
+        }
+    }
+}

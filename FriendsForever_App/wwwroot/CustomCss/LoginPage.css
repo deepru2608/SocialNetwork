@@ -165,13 +165,13 @@ a.scroll-top {
 }
 
 
-.user-registerbox h3, #calendar .fc-toolbar {
-    background: #ffcfb3;
-    background: -webkit-linear-gradient(15deg, #004c00, #28a745, #114c00);
-    background: -moz-linear-gradient(15deg, #004c00, #28a745, #114c00);
-    background: -o-linear-gradient(15deg, #004c00, #28a745, #114c00);
-    background: linear-gradient(15deg, #fd7e14, #fd7e14, #fd7e14);
-}
+    .user-registerbox h3, #calendar .fc-toolbar {
+        background: #ffcfb3;
+        background: -webkit-linear-gradient(15deg, #004c00, #28a745, #114c00);
+        background: -moz-linear-gradient(15deg, #004c00, #28a745, #114c00);
+        background: -o-linear-gradient(15deg, #004c00, #28a745, #114c00);
+        background: linear-gradient(15deg, #0A79DF, #0A79DF, #0A79DF);
+    }
 
 /*html {
     height: 100%;
@@ -841,12 +841,6 @@ footer {
 
 
 
-body {
-    background-image: url(../Images/bg.jpg);
-    background-position: center;
-    background-size: cover;
-    background-attachment: fixed;
-}
 
 .refresh_btn {
     width: 100px;

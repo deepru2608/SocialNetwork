@@ -15,5 +15,6 @@ namespace FriendsForever_Api.Security
         public string Gender { get; set; }
         public string ProfilePhotoPath { get; set; }
         public string Country { get; set; }
+        public DateTime RegistrationTime { get; set; }
     }
 }

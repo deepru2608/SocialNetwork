@@ -1,0 +1,243 @@
+﻿<!-- Card Narrower -->
+<div class="card card-cascade narrower">
+    <!-- Card content -->
+    <div class="card-body card-body-cascade">
+        <div class="row mb-3">
+            <div class="col-sm-12 mb-2">
+                <h5 class="card-title"><span class="border-bottom" style="color:#0078d6">Edit Profile</span></h5>
+            </div>
+            <div class="col-sm-12 mb-2">
+                <!-- Label -->
+                <h5 class="pb-2 pt-1">Upload Profile Image</h5>
+                @*<SfUploader ID="UploadFiles" DropArea=".control-fluid" AllowedExtensions=".png, .jpg, .jpeg, .gif"
+                            MaxFileSize=104857600 AutoUpload="false" OnChange="@(e => UploadProfileImage(e.Value.ToString()))">
+                    <UploaderAsyncSettings SaveUrl="api/Upload/SaveProfile"></UploaderAsyncSettings>
+                </SfUploader>*@
+                <MatFileUpload OnChange="@UploadProfileImage"></MatFileUpload>
+            </div>
+            <div class="col-sm-12 mb-1">
+                <div class="alert alert-info" role="alert">
+                    <h4 class="alert-heading">Important Note!</h4>
+                    <p>If you add multiple interest at same time, Just add comman<b>(,)</b> between two interest without spacing.</p>
+                </div>
+            </div>
+            <div class="col-sm-12 mb-2">
+                <SfTextBox Placeholder="Enter your interest" Multiline="true" @bind-Value="Interest" FloatLabelType="FloatLabelType.Auto"></SfTextBox>
+            </div>
+            <div class="col-sm-12 mb-2">
+                <SfButton IsPrimary="true" OnClick="InsertUserInterestAsync"><i class="fas fa-save"></i>&nbsp;Submit Interest</SfButton>
+                &nbsp;<img src="Images/BlockLoader.gif" style="height: 30px; width: 30px; display: @Loader" />
+            </div>
+        </div>
+        <EditForm Model="@editProfileModel" OnValidSubmit="UpdateUserInformationAsync">
+            <DataAnnotationsValidator />
+            <div class="row">
+                <div class="col-sm-6">
+                    <SfTextBox Placeholder="First Name" @bind-Value="editProfileModel.FirstName" FloatLabelType="FloatLabelType.Auto"></SfTextBox>
+                    <ValidationMessage For="@(() => editProfileModel.FirstName)" style="color: red"></ValidationMessage>
+                </div>
+                <div class="col-sm-6">
+                    <SfTextBox Placeholder="Last Name" @bind-Value="editProfileModel.LastName" FloatLabelType="FloatLabelType.Auto"></SfTextBox>
+                    <ValidationMessage For="@(() => editProfileModel.LastName)" style="color: red"></ValidationMessage>
+                </div>
+                <div class="col-sm-6">
+                    <SfTextBox Placeholder="Mobile Number" @bind-Value="editProfileModel.MobileNumber" FloatLabelType="FloatLabelType.Auto"></SfTextBox>
+                    <ValidationMessage For="@(() => editProfileModel.MobileNumber)" style="color: red"></ValidationMessage>
+                </div>
+                <div class="col-sm-6">
+                    <SfTextBox Placeholder="Email Address" @bind-Value="editProfileModel.Email" FloatLabelType="FloatLabelType.Auto"></SfTextBox>
+                    <ValidationMessage For="@(() => editProfileModel.Email)" style="color: red"></ValidationMessage>
+                </div>
+                <div class="col-sm-12 mb-2">
+                    <SfButton IsPrimary="true"><i class="fas fa-save"></i>&nbsp;Save Details</SfButton>
+                    &nbsp;<img src="Images/BlockLoader.gif" style="height: 30px; width: 30px; display: @profileUpdatedLoader" />
+                </div>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+<SfToast @ref="ToastObj" ID="toast_type">
+    <ToastPosition X="Right"></ToastPosition>
+</SfToast>
+
+
+@code {
+    SfToast ToastObj;
+    public string Interest { get; set; }
+    public string Loader { get; set; }
+    public EditProfileViewModel editProfileModel { get; set; } = new EditProfileViewModel();
+    public string profileUpdatedLoader { get; set; }
+    public string globalUserId { get; set; }
+    [Parameter]
+    public EventCallback<bool> isFileUploaded { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        Loader = "none";
+        profileUpdatedLoader = "none";
+        var user = await userService.GetUserDetailsAsync();
+        globalUserId = user.Id;
+        if (user != null)
+        {
+            editProfileModel.FirstName = user.FirstName;
+            editProfileModel.LastName = user.LastName;
+            editProfileModel.Email = user.Email;
+            editProfileModel.MobileNumber = user.PhoneNumber;
+        }
+    }
+
+    async Task InsertUserInterestAsync()
+    {
+        Loader = "inline";
+        if (!string.IsNullOrEmpty(Interest))
+        {
+            try
+            {
+                var user = await userService.GetUserDetailsAsync();
+                if (Interest.Contains(","))
+                {
+                    var userInterests = Interest.Split(',');
+                    int counter = 0;
+                    for (int i = 0; i < userInterests.Length; i++)
+                    {
+                        UserInterest userThings = new UserInterest
+                        {
+                            UserId = user.Id,
+                            InterestName = userInterests[i],
+                            Added_Time_Stamp = DateTime.Now
+                        };
+                        var result = await centerService.InsertUserInterestAsync(userThings);
+                        counter++;
+                    }
+
+                    if (counter == userInterests.Length)
+                    {
+                        Loader = "none";
+                        await ToastObj.Show(new ToastModel { Title = "Success!", Content = "You has added your interest successfully.", CssClass = "e-toast-success", Icon = "e-success toast-icons" });
+                    }
+                    else
+                    {
+                        Loader = "none";
+                        await ToastObj.Show(new ToastModel { Title = "Error!", Content = "Something goes wrong, please try later!", CssClass = "e-toast-danger", Icon = "e-error toast-icons" });
+                    }
+                }
+                else
+                {
+                    UserInterest userThings = new UserInterest
+                    {
+                        UserId = user.Id,
+                        InterestName = Interest,
+                        Added_Time_Stamp = DateTime.Now
+                    };
+                    var result = await centerService.InsertUserInterestAsync(userThings);
+                    if (result > 0)
+                    {
+                        Loader = "none";
+                        await ToastObj.Show(new ToastModel { Title = "Success!", Content = "You has added your interest successfully.", CssClass = "e-toast-success", Icon = "e-success toast-icons" });
+                    }
+                    else
+                    {
+                        Loader = "none";
+                        await ToastObj.Show(new ToastModel { Title = "Error!", Content = "Something goes wrong, please try later!", CssClass = "e-toast-danger", Icon = "e-error toast-icons" });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Loader = "none";
+                await ToastObj.Show(new ToastModel { Title = "Error!", Content = ex.Message, CssClass = "e-toast-danger", Icon = "e-error toast-icons" });
+            }
+        }
+        else
+        {
+            Loader = "none";
+            await ToastObj.Show(new ToastModel { Title = "Error!", Content = "Please enter your interests first!", CssClass = "e-toast-danger", Icon = "e-error toast-icons" });
+        }
+
+        StateHasChanged();
+    }
+
+    async Task UpdateUserInformationAsync()
+    {
+        profileUpdatedLoader = "inline";
+        if (editProfileModel != null)
+        {
+            try
+            {
+                var user = await userService.GetUserDetailsAsync();
+                if (user != null)
+                {
+                    var result = await userService.UpdateUserProfileAsync(editProfileModel);
+                    if (result == "1")
+                    {
+                        Loader = "none";
+                        await ToastObj.Show(new ToastModel { Title = "Success!", Content = "Your profile have been updated successfully.", CssClass = "e-toast-success", Icon = "e-success toast-icons" });
+                    }
+                    else if (result == "0")
+                    {
+                        profileUpdatedLoader = "none";
+                        await ToastObj.Show(new ToastModel { Title = "Error!", Content = "You are sending invalid request, please try again", CssClass = "e-toast-danger", Icon = "e-error toast-icons" });
+                    }
+                    else
+                    {
+                        profileUpdatedLoader = "none";
+                        await ToastObj.Show(new ToastModel { Title = "Error!", Content = result, CssClass = "e-toast-danger", Icon = "e-error toast-icons" });
+                    }
+                }
+                else
+                {
+                    profileUpdatedLoader = "none";
+                    await ToastObj.Show(new ToastModel { Title = "Error!", Content = "You are not logged in, please login first!", CssClass = "e-toast-danger", Icon = "e-error toast-icons" });
+                    navigationManager.NavigateTo("Login", true);
+                }
+            }
+            catch (Exception ex)
+            {
+                profileUpdatedLoader = "none";
+                await ToastObj.Show(new ToastModel { Title = "Error!", Content = ex.Message, CssClass = "e-toast-danger", Icon = "e-error toast-icons" });
+            }
+        }
+        else
+        {
+            profileUpdatedLoader = "none";
+            await ToastObj.Show(new ToastModel { Title = "Error!", Content = "Please fill all the fields!", CssClass = "e-toast-danger", Icon = "e-error toast-icons" });
+        }
+
+        StateHasChanged();
+    }
+
+    async Task UploadProfileImage(IMatFileUploadEntry[] files)
+    {
+        if (files.Any())
+        {
+            try
+            {
+                var file = files.FirstOrDefault();
+                if (file != null)
+                {
+                    string uploadsFolder = Path.Combine(hostingEnvironment.WebRootPath, "Images", "ProfileImage");
+                    string uniqueFileName = Guid.NewGuid().ToString() + "_" + file.Name;
+                    string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+                    var memoryStream = new MemoryStream();
+                    await file.WriteToStreamAsync(memoryStream);
+                    using (FileStream fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
+                    {
+                        await memoryStream.CopyToAsync(fileStream);
+                    }
+
+                    await isFileUploaded.InvokeAsync(true);
+                }
+                else
+                {
+                    await ToastObj.Show(new ToastModel { Title = "Error!", Content = "Please upload the file!", CssClass = "e-toast-danger", Icon = "e-error toast-icons" });
+                }
+            }
+            catch (Exception ex)
+            {
+                await ToastObj.Show(new ToastModel { Title = "Error!", Content = ex.Message, CssClass = "e-toast-danger", Icon = "e-error toast-icons" });
+            }
+        }
+    }
+}
+

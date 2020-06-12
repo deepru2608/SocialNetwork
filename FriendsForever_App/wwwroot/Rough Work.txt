@@ -1,0 +1,249 @@
+﻿@*<div class="page-wrapper">
+        <div class="mx-auto login">
+            <div class="user-registerbox">
+                <h3>Login in to Your Account</h3>
+                <div class="registerbox-content">
+                    <EditForm Model="loginModel" OnValidSubmit="LoginUser">
+                        <DataAnnotationsValidator />
+                        <div class="row">
+                            <div class="col-sm-12 col-md-12 col-lg-12">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <SfTextBox CssClass="e-outline" Placeholder="Username" FloatLabelType="@FloatLabelType.Auto"
+                                                   @bind-Value="loginModel.Username"></SfTextBox>
+                                        <ValidationMessage For="@(() => loginModel.Username)" style="color: red" />
+                                    </div>
+                                </div>
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <SfTextBox CssClass="e-outline" Placeholder="Password" FloatLabelType="@FloatLabelType.Auto"
+                                                   @bind-Value="loginModel.Password" Type="password"></SfTextBox>
+                                        <ValidationMessage For="@(() => loginModel.Password)" style="color: red" />
+                                    </div>
+                                </div>
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <ReCAPTCHA @ref="reCAPTCHAComponent" SiteKey="6Lcz8uQUAAAAAMl5mtZeajPit7f6yBgqNt3uq4fE"
+                                                   OnSuccess="OnSuccess" OnExpired="OnExpired" />
+                                    </div>
+                                </div>
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <div class="custom-control custom-checkbox">
+                                            <input type="checkbox" id="chk" class="custom-control-input" @bind-value="loginModel.RememberMe">
+                                            <label class="custom-control-label" for="chk">Remember Me</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-12 text-center">
+                                    <div class="pb-2">
+                                        <SfButton IsPrimary="true">
+                                            <i class="fas fa-sign-in-alt"></i>&nbsp;Sign in
+                                        </SfButton>
+                                        &nbsp;<img src="Images/BlockLoader.gif" style="height: 30px; width: 30px; display: @Loader" />
+                                        <br />
+                                    </div>
+                                    <strong><a href="#" data-toggle="modal" data-target="#staticBackdrop" style="color: #3C40C6">Forgot Password</a> </strong>
+                                </div>
+                                <div class="form-group row text-center">
+                                    <div class="col-md-6 col-lg-12">
+                                        Don't have an account !
+                                        <strong><a href="Register" style="color: #3C40C6">Sign Up Here</a></strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+        <!-- scroll to top  -->
+        <a href="#" class="scroll-top" style="display:none;"></a>
+        <!-- end of scroll to top -->
+    </div>*@
+
+
+    <!-- Outer Row -->
+<div class="row justify-content-center">
+    <div class="col-xl-10 col-lg-12 col-md-9">
+        <div class="card o-hidden border-0 shadow-lg my-5">
+            <div class="card-body p-0">
+                <!-- Nested Row within Card Body -->
+                <EditForm Model="loginModel" OnValidSubmit="LoginUser">
+                    <DataAnnotationsValidator />
+                    <div class="row">
+                        <div class="col-lg-6 d-none d-lg-block bg-login-image"></div>
+                        <div class="col-lg-6">
+                            <div class="p-5">
+                                <div class="text-center">
+                                    <h1 class="h4 text-gray-900 mb-4">Welcome Back!</h1>
+                                </div>
+                                <form class="user" method="post">
+                                    <div class="form-group">
+                                        <input @bind-value="loginModel.Username" class="form-control form-control-user" id="exampleInputUsername"
+                                               aria-describedby="emailHelp" placeholder="Username" autocomplete="off">
+                                        <ValidationMessage For="@(() => loginModel.Username)" style="color: red" />
+                                    </div>
+                                    <div class="form-group">
+                                        <input @bind-value="loginModel.Password" class="form-control form-control-user" id="exampleInputPassword"
+                                               placeholder="Password" autocomplete="off">
+                                        <ValidationMessage For="@(() => loginModel.Password)" style="color: red" />
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="custom-control custom-checkbox small">
+                                            <input @bind-value="loginModel.RememberMe" type="checkbox" class="custom-control-input" id="customCheck">
+                                            <label class="custom-control-label" for="customCheck">Remember Me</label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group row">
+                                        <ReCAPTCHA @ref="reCAPTCHAComponent" SiteKey="6Lcz8uQUAAAAAMl5mtZeajPit7f6yBgqNt3uq4fE"
+                                                   OnSuccess="OnSuccess" OnExpired="OnExpired" />
+                                    </div>
+                                    <button asp-action="Login" asp-controller="Account" class="btn btn-primary btn-user btn-block" type="submit">
+                                        Login
+                                    </button>
+                                    <hr>
+                                    <a href="index.html" class="btn btn-google btn-user btn-block">
+                                        <i class="fab fa-google fa-fw"></i> Login with Google
+                                    </a>
+                                    <a href="index.html" class="btn btn-facebook btn-user btn-block">
+                                        <i class="fab fa-facebook-f fa-fw"></i> Login with Facebook
+                                    </a>
+                                </form>
+                                <hr>
+                                <div class="text-center">
+                                    <a class="small" href="forgot-password.html">Forgot Password?</a>
+                                </div>
+                                <div class="text-center">
+                                    <a class="small" asp-action="Register" asp-controller="Account">Create an Account!</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+@*@if (CountryList.Count() <= 0)
+    {
+        <div class="spinner">
+            <img src="Images/BlockLoader.gif" style="height: 100px; width: 100px;" />
+        </div>
+    }
+    else
+    {
+        <div class="page-wrapper">
+            <div class="container">
+                <div class="card card-login mx-auto bg-light">
+                    <h3 class="text-center h3TagClass"> Registration Form </h3>
+                    <EditForm Model="registerModel" OnValidSubmit="CreateUserAsync">
+                        <DataAnnotationsValidator />
+                        <div class="card-body py-1">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <SfTextBox CssClass="e-outline" Placeholder="First Name" FloatLabelType="@FloatLabelType.Auto"
+                                                   @bind-Value="registerModel.FirstName"></SfTextBox>
+                                        <ValidationMessage For="@(() => registerModel.FirstName)" style="color: red" />
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <SfTextBox CssClass="e-outline" Placeholder="Last Name" FloatLabelType="@FloatLabelType.Auto"
+                                                   @bind-Value="registerModel.LastName"></SfTextBox>
+                                        <ValidationMessage For="@(() => registerModel.LastName)" style="color: red" />
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <SfTextBox CssClass="e-outline" Placeholder="Username" FloatLabelType="@FloatLabelType.Auto"
+                                                   @bind-Value="registerModel.Username" OnChange="@(e => CheckUsernameAsync(e.Value.ToString()))"></SfTextBox>
+                                        <ValidationMessage For="@(() => registerModel.Username)" style="color: red" />
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <SfTextBox CssClass="e-outline" Placeholder="Email Address" FloatLabelType="@FloatLabelType.Auto"
+                                                   @bind-Value="registerModel.Email" OnChange="@(e => CheckEmailAsync(e.Value.ToString()))"></SfTextBox>
+                                        <ValidationMessage For="@(() => registerModel.Email)" style="color: red" />
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <SfTextBox CssClass="e-outline" Placeholder="Mobile Number" FloatLabelType="@FloatLabelType.Auto"
+                                                   @bind-Value="registerModel.MobileNo" OnChange="@(e => CheckMobileAsync(e.Value.ToString()))"></SfTextBox>
+                                        <ValidationMessage For="@(() => registerModel.MobileNo)" style="color: red" />
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <SfDatePicker TValue="DateTime" Placeholder="Date of birth" FloatLabelType="@FloatLabelType.Auto"
+                                                      Format="dd-MMM-yy" @bind-Value="registerModel.Dob"></SfDatePicker>
+                                        <ValidationMessage For="@(() => registerModel.Dob)" style="color: red" />
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <SfDropDownList TItem="DropDownViewModel" TValue="string" PopupHeight="230px" Index="2"
+                                                        Placeholder="Select Gender" @bind-Value="@registerModel.Gender" DataSource="GenderList">
+                                            <DropDownListFieldSettings Text="Text" Value="Text"></DropDownListFieldSettings>
+                                        </SfDropDownList>
+                                        <ValidationMessage For="@(() => registerModel.Gender)" style="color: red" />
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <SfDropDownList TItem="Country" TValue="string" DataSource="CountryList" PopupHeight="230px"
+                                                        Placeholder="Select Country" Index="2" @bind-Value="registerModel.Country">
+                                            <DropDownListFieldSettings Text="CountryName" Value="CountryName"></DropDownListFieldSettings>
+                                        </SfDropDownList>
+                                        <ValidationMessage For="@(() => registerModel.Country)" style="color: red" />
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <SfTextBox CssClass="e-outline" Placeholder="Password" FloatLabelType="@FloatLabelType.Auto"
+                                                   @bind-Value="registerModel.Password" Type="password"></SfTextBox>
+                                        <ValidationMessage For="@(() => registerModel.Password)" style="color: red" />
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <SfTextBox CssClass="e-outline" Placeholder="Confirm Password" FloatLabelType="@FloatLabelType.Auto"
+                                                   @bind-Value="registerModel.ConfirmPassword" Type="password"></SfTextBox>
+                                        <ValidationMessage For="@(() => registerModel.ConfirmPassword)" style="color: red" />
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <ReCAPTCHA @ref="reCAPTCHAComponent" SiteKey="6Lcz8uQUAAAAAMl5mtZeajPit7f6yBgqNt3uq4fE"
+                                               OnSuccess="OnSuccess" OnExpired="OnExpired" />
+                                </div>
+                                <div class="col-md-12 text-center mt-2">
+                                    <SfButton IsPrimary="true"><i class="fas fa-sign-in-alt"></i>&nbsp;Sign Up</SfButton>
+                                    &nbsp;<img src="Images/BlockLoader.gif"
+                                               style="height: 30px; width: 30px; display: @Loader" />
+                                    <p class="mt-1">
+                                        Registered User ?  <strong>
+                                            <a href="/" style="color: #3C40C6">Sign In Here</a>
+                                        </strong>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </EditForm>
+                </div>
+                <br />
+            </div>s
+            <a href="#" class="scroll-top" style="display:none;"></a>
+            <!-- end of scroll to top -->
+        </div>
+    }*@

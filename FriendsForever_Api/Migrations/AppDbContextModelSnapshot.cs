@@ -84,6 +84,9 @@ namespace FriendsForever_Api.Migrations
                     b.Property<string>("ProfilePhotoPath")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime>("RegistrationTime")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 

@@ -1,7 +1,33 @@
-﻿@page "/"
+﻿@layout MainLayout
+@page "/"
+@attribute [Authorize]
 
-<h1>Hello, world!</h1>
 
-Welcome to your new app.
+<div class="main">
+    <div class="row">
+        <!-- Left Column -->
+        <div class="col-md-3 mt-2">
+            <div class="d-none d-sm-none d-md-block">
+                <Profile />
+            </div>
+        </div>
 
-<SfCalendar TValue ="DateTime?"></SfCalendar>
+        <!-- Middle Column -->
+        <div class="col-md-6 col-sm-12 mt-2">
+            <AllPosts />
+        </div>
+
+        <!-- Right Column -->
+        <div class="col-md-3 mt-2">
+            <div class="d-none d-sm-none d-md-block">
+                <div class="pb-3">
+                    <FriendsRequest />
+                </div>
+                <div class="pb-3">
+                    <FriendsList />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

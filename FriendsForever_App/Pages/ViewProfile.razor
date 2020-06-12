@@ -1,0 +1,27 @@
+﻿@page "/ViewProfile"
+
+<div class="main">
+    <div class="row">
+        <!-- Left Column -->
+        <div class="col-md-4 col-sm-12 mt-2">
+            <Profile />
+        </div>
+
+        <!-- Middle Column -->
+        <div class="col-md-8 col-sm-12 mt-2">
+            <EditProfile isFileUploaded="checkFileUploadOrNot" />
+        </div>
+    </div>
+</div>
+
+@code {
+
+
+    void checkFileUploadOrNot(bool isUploaded)
+    {
+        if (isUploaded)
+        {
+            navigationManager.NavigateTo("ViewProfile", true);
+        }
+    }
+}

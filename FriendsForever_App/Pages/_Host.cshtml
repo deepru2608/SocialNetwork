@@ -12,16 +12,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>FriendsForever_App</title>
     <base href="~/" />
-    <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
-    <link href="css/site.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@9" asp-append-version="true"></script>
     <link rel="stylesheet" href="https://cdn.syncfusion.com/ej2/18.1.45/fabric.css" asp-append-version="true" />
 
-    <!-- Bootstrap -->
-    <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet" asp-append-version="true" />
-
-    <!-- font Awesome -->
-    <link href="font-awesome/css/all.min.css" rel="stylesheet" asp-append-version="true" />
-    <link href="font-awesome/css/fontawesome.min.css" rel="stylesheet" asp-append-version="true" />
+    <link href="_content/MatBlazor/dist/matBlazor.css" rel="stylesheet" asp-append-version="true" />
 
     <!-- Custom Css -->
     <link href="CustomCss/mainSite.css" rel="stylesheet" asp-append-version="true" />
@@ -29,6 +23,16 @@
     <!-- Account Css -->
     <link href="CustomCss/LoginPage.css" rel="stylesheet" asp-append-version="true" />
     <link href="CustomCss/RegisterPage.css" rel="stylesheet" asp-append-version="true" />
+
+    <!-- Md Bootstrap Plugin -->
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css" asp-append-version="true">
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" asp-append-version="true">
+    <!-- Bootstrap core CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.1/css/bootstrap.min.css" rel="stylesheet" asp-append-version="true">
+    <!-- Material Design Bootstrap -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.16.0/css/mdb.min.css" rel="stylesheet" asp-append-version="true">
 </head>
 <body>
     <app>
@@ -46,11 +50,24 @@
         <a class="dismiss">🗙</a>
     </div>
 
-    <!-- Jquery Library -->
-    <script src="jquery/jquery.min.js" asp-append-version="true"></script>
-    <!-- Bootstrap Jquery Library -->
-    <script src="bootstrap/js/bootstrap.min.js" asp-append-version="true"></script>
-
     <script src="_framework/blazor.server.js"></script>
+
+    <script src="CustomJS/reCaptcha.js" asp-append-version="true"></script>
+    <script src="_content/Microsoft.AspNetCore.ProtectedBrowserStorage/protectedBrowserStorage.js" asp-append-version="true"></script>
+
+    <!-- Md Bootstrap Javascript Library -->
+    <!-- JQuery -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <!-- Bootstrap tooltips -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.4/umd/popper.min.js"></script>
+    <!-- Bootstrap core JavaScript -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    <!-- MDB core JavaScript -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mdbootstrap/4.16.0/js/mdb.min.js"></script>
+
+    <script src="_content/MatBlazor/dist/matBlazor.js" asp-append-version="true"></script>
+
+    <!-- Main Site Javascript File -->
+    <script src="~/CustomJS/mainSite.js" asp-append-version="true"></script>
 </body>
 </html>

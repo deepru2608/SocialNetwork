@@ -18,19 +18,19 @@ namespace FriendsForever_App.Auth
         private static readonly string TokenKey = "access_token";
         private readonly IHttpClientFactory httpClientFactory;
         private AuthenticationState Anonymous => new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
-        public ProtectedLocalStorage protectedLocalStorage { get; }
+        public ProtectedLocalStorage LocalStorage { get; }
 
         HttpClient httpClient;
 
         public JWTAuthenticationProvider(IHttpClientFactory httpClientFactory, ProtectedLocalStorage protectedLocalStorage)
         {
             this.httpClientFactory = httpClientFactory;
-            this.protectedLocalStorage = protectedLocalStorage;
+            this.LocalStorage = protectedLocalStorage;
         }
 
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
-            var token = await protectedLocalStorage.GetAsync<string>(TokenKey);
+            var token = await LocalStorage.GetAsync<string>(TokenKey);
 
             if (string.IsNullOrEmpty(token))
             {
@@ -89,7 +89,7 @@ namespace FriendsForever_App.Auth
 
         public async Task Login(string token)
         {
-            await protectedLocalStorage.SetAsync(TokenKey, token);
+            await LocalStorage.SetAsync(TokenKey, token);
             var authState = BuildAuthenticationState(token);
             NotifyAuthenticationStateChanged(Task.FromResult(authState));
         }
@@ -97,7 +97,7 @@ namespace FriendsForever_App.Auth
         public async Task Logout()
         {
             httpClient.DefaultRequestHeaders.Authorization = null;
-            await protectedLocalStorage.DeleteAsync(TokenKey);
+            await LocalStorage.DeleteAsync(TokenKey);
             NotifyAuthenticationStateChanged(Task.FromResult(Anonymous));
         }
     }

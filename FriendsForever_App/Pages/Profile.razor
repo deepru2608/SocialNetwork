@@ -1,0 +1,74 @@
+﻿<!-- Card Narrower -->
+<div class="card card-cascade narrower">
+    <!-- Card image -->
+    <div class="view view-cascade overlay">
+        @{
+            var profilePhotoPath = (model.ProfilePhotoPath ?? "deepuProfile.jpg");
+        }
+        <img class="card-img-top" src="/Images/ProfileImage/@profilePhotoPath"
+             alt="Card image cap">
+        <a>
+            <div class="mask rgba-white-slight"></div>
+        </a>
+    </div>
+
+    <!-- Card content -->
+    <div class="card-body card-body-cascade">
+
+        <!-- Label -->
+        <h5 class="pb-2 pt-1"><span style="color:#0078d6"><i class="fas fa-user"></i> @model.Name</span></h5>
+
+        <!-- Title -->
+        <p style="font-size: 13px; color:#747373; margin-bottom: 2px"><i class="fas fa-envelope-open-text fa-fw" style="color:#0078d6"></i>&nbsp;@model.Email</p>
+        <p style="font-size: 13px; color:#747373; margin-bottom: 2px"><i class="fa fa-home fa-fw" style="color:#0078d6"></i>&nbsp;@model.Country</p>
+        <p style="font-size: 13px; color:#747373"><i class="fa fa-birthday-cake fa-fw" style="color:#0078d6"></i>&nbsp;@model.Dob.ToLongDateString()</p>
+
+        <!-- Text -->
+        <p class="card-text">
+            <h5>Interests</h5>
+            @if (model.UserInterests.Any())
+            {
+                @foreach (var interest in model.UserInterests)
+                {
+                    <span class="myOwnPills">@interest</span>
+                }
+            }
+            else
+            {
+                <span class="myOwnPills">No interest added.</span>
+            }
+        </p>
+
+        <!-- Button -->
+        <SfButton IsPrimary="true" Content="View Profile" OnClick="ViewUserProfile"></SfButton>
+    </div>
+</div>
+<!-- Card Narrower -->
+
+
+@code {
+    public UserDashboardViewModel model = new UserDashboardViewModel();
+    private IDataProtector dataProtector;
+    //private string TextValue = "Deepanshu Ruhela";
+
+    protected override async Task OnInitializedAsync()
+    {
+        dataProtector = dataProtectionProvider.CreateProtector(dataProtectionPurposeStrings.RouteValue);
+        var user = await userService.GetUserDetailsAsync();
+        if (user != null)
+        {
+            model.Name = user.FullName;
+            model.Dob = user.Dob;
+            model.Country = user.Country;
+            model.Email = user.Email;
+            model.ProfilePhotoPath = user.ProfilePhotoPath;
+            IEnumerable<string> interests = await centerService.FindByIdUserInterestAsync(user.Id);
+            model.UserInterests = interests;
+        }
+    }
+
+    private void ViewUserProfile()
+    {
+        navigationManager.NavigateTo(nameof(ViewProfile), true);
+    }
+}

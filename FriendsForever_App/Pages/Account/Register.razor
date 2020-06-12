@@ -1,0 +1,267 @@
+﻿@layout AccountLayout
+@page "/Register"
+@inject ILoginService loginService
+
+@if (CountryList.Count() <= 0)
+{
+    <div class="spinner">
+        <img src="Images/BlockLoader.gif" style="height: 100px; width: 100px;" />
+    </div>
+}
+else
+{
+    <!-- Card Regular -->
+    <div class="card card-cascade" style="margin-top: 30px; margin-left: 60px; margin-right: 60px">
+        <div class="row">
+            <div class="col-md-6 d-none d-sm-none d-md-block">
+                <!-- Card image -->
+                <div class="view view-cascade overlay">
+                    <img class="card-img-top img-fluid" style="background-size: cover; max-height:700px"
+                         src="https://source.unsplash.com/Mv9hjnEUHR4/600x800" alt="Card image cap">
+                    <a>
+                        <div class="mask rgba-white-slight"></div>
+                    </a>
+                </div>
+            </div>
+            <div class="col-md-6 col-sm-12">
+                <!-- Card content -->
+                <div class="card-body card-body-cascade">
+                    <!-- Title -->
+                    <h4 class="card-title text-center"><strong class="border-bottom">Friends Forever Registration</strong></h4>
+
+                    <EditForm Model="registerModel" OnValidSubmit="CreateUserAsync">
+                        <DataAnnotationsValidator />
+                        <div class="card-body py-1">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <SfTextBox CssClass="e-outline" Placeholder="First Name"
+                                                   @bind-Value="registerModel.FirstName"></SfTextBox>
+                                        <ValidationMessage For="@(() => registerModel.FirstName)" style="color: red" />
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <SfTextBox CssClass="e-outline" Placeholder="Last Name"
+                                                   @bind-Value="registerModel.LastName"></SfTextBox>
+                                        <ValidationMessage For="@(() => registerModel.LastName)" style="color: red" />
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <SfTextBox CssClass="e-outline" Placeholder="Username"
+                                                   @bind-Value="registerModel.Username" OnChange="@(e => CheckUsernameAsync(e.Value.ToString()))"></SfTextBox>
+                                        <ValidationMessage For="@(() => registerModel.Username)" style="color: red" />
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <SfTextBox CssClass="e-outline" Placeholder="Email Address"
+                                                   @bind-Value="registerModel.Email" OnChange="@(e => CheckEmailAsync(e.Value.ToString()))"></SfTextBox>
+                                        <ValidationMessage For="@(() => registerModel.Email)" style="color: red" />
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <SfTextBox CssClass="e-outline" Placeholder="Mobile Number"
+                                                   @bind-Value="registerModel.MobileNo" OnChange="@(e => CheckMobileAsync(e.Value.ToString()))"></SfTextBox>
+                                        <ValidationMessage For="@(() => registerModel.MobileNo)" style="color: red" />
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <SfDatePicker TValue="DateTime?" Placeholder="Date of birth"
+                                                      Format="dd-MMM-yy" @bind-Value="registerModel.Dob"></SfDatePicker>
+                                        <ValidationMessage For="@(() => registerModel.Dob)" style="color: red" />
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <SfDropDownList TItem="DropDownViewModel" TValue="string" PopupHeight="230px" Index="2"
+                                                        Placeholder="Select Gender" @bind-Value="@registerModel.Gender" DataSource="GenderList">
+                                            <DropDownListFieldSettings Text="Text" Value="Text"></DropDownListFieldSettings>
+                                        </SfDropDownList>
+                                        <ValidationMessage For="@(() => registerModel.Gender)" style="color: red" />
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <SfDropDownList TItem="Country" TValue="string" DataSource="CountryList" PopupHeight="230px"
+                                                        Placeholder="Select Country" Index="2" @bind-Value="registerModel.Country">
+                                            <DropDownListFieldSettings Text="CountryName" Value="CountryName"></DropDownListFieldSettings>
+                                        </SfDropDownList>
+                                        <ValidationMessage For="@(() => registerModel.Country)" style="color: red" />
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <SfTextBox CssClass="e-outline" Placeholder="Password"
+                                                   @bind-Value="registerModel.Password" Type="password"></SfTextBox>
+                                        <ValidationMessage For="@(() => registerModel.Password)" style="color: red" />
+                                    </div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <div class="form-group">
+                                        <SfTextBox CssClass="e-outline" Placeholder="Confirm Password"
+                                                   @bind-Value="registerModel.ConfirmPassword" Type="password"></SfTextBox>
+                                        <ValidationMessage For="@(() => registerModel.ConfirmPassword)" style="color: red" />
+                                    </div>
+                                </div>
+                                <div class="col-md-12">
+                                    <ReCAPTCHA @ref="reCAPTCHAComponent" SiteKey="6Lcz8uQUAAAAAMl5mtZeajPit7f6yBgqNt3uq4fE"
+                                               OnSuccess="OnSuccess" OnExpired="OnExpired" />
+                                </div>
+                                <div class="col-md-12 text-center mt-4">
+                                    <SfButton IsPrimary="true"><i class="fas fa-sign-in-alt"></i>&nbsp;Sign Up</SfButton>
+                                    &nbsp;<img src="Images/BlockLoader.gif"
+                                               style="height: 30px; width: 30px; display: @Loader" />
+                                    <p class="mt-3">
+                                        Registered User ?  <strong>
+                                            <a href="Login" style="color: #3C40C6">Sign In Here</a>
+                                        </strong>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+
+
+@code {
+    public DateTime dobData { get; set; } = DateTime.Now;
+    public RegisterViewModel registerModel { get; set; }
+    public IEnumerable<Country> CountryList { get; set; }
+    public IEnumerable<DropDownViewModel> GenderList { get; set; }
+    private bool UniqueMobile = true;
+    private bool UniqueEmail = true;
+    private bool UniqueUsername = true;
+    public ReCAPTCHA reCAPTCHAComponent;
+    public bool ValidReCAPTCHA = false;
+
+    public string Loader { get; set; }
+
+    public bool ServerVerificatiing = false;
+
+    public bool DisablePostButton => !ValidReCAPTCHA || ServerVerificatiing;
+
+    protected void OnSuccess()
+    {
+        ValidReCAPTCHA = true;
+    }
+
+    protected void OnExpired()
+    {
+        ValidReCAPTCHA = false;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        registerModel = new RegisterViewModel();
+        registerModel.Dob = DateTime.Now;
+        CountryList = new List<Country>();
+        CountryList = await userService.GetCountryListAsync();
+        Loader = "none";
+        GenderList = BindGender();
+    }
+
+    private IEnumerable<DropDownViewModel> BindGender()
+    {
+        List<DropDownViewModel> liGender = new List<DropDownViewModel>();
+        liGender.Add(new DropDownViewModel { Value = 1, Text = "Male" });
+        liGender.Add(new DropDownViewModel { Value = 2, Text = "Female" });
+        liGender.Add(new DropDownViewModel { Value = 3, Text = "Transgender" });
+        return liGender;
+    }
+
+    private async Task CreateUserAsync()
+    {
+        if (ValidReCAPTCHA)
+        {
+            var response = await reCAPTCHAComponent.GetResponseAsync();
+            try
+            {
+                Loader = "inline";
+                ServerVerificatiing = true;
+                StateHasChanged();
+                SampleAPIArgs args = new SampleAPIArgs
+                {
+                    reCAPTCHAResponse = response
+                };
+                var captchaResponse = await captchaService.GetCaptchaVerification(args);
+                if (captchaResponse == "success")
+                {
+                    if (UniqueUsername && UniqueMobile && UniqueEmail)
+                    {
+                        var userToken = await userService.RegisterNewUserAsync(registerModel);
+                        if (userToken.Status.ToLower() == "success")
+                        {
+                            await loginService.Login(userToken.Token);
+                            Loader = "none";
+                            navigationManager.NavigateTo("/", true);
+                        }
+                        else
+                        {
+                            await jS.ShowAlert("Oops", "You are not send proper request, please try again!", SweetAlertMessageType.error);
+                            Loader = "none";
+                        }
+                    }
+                    else
+                    {
+                        await jS.ShowAlert("Mobile number, Username or Email should be unique!");
+                        navigationManager.NavigateTo("Register", true);
+                        Loader = "none";
+                    }
+                }
+                else
+                {
+                    await jS.ShowAlert("Captcha has been expired, please reload the page!");
+                    navigationManager.NavigateTo("Register", true);
+                    Loader = "none";
+                }
+            }
+            catch (HttpRequestException e)
+            {
+                Loader = "none";
+                await jS.ShowAlert(e.Message + " or Reload the page!");
+                ServerVerificatiing = false;
+                navigationManager.NavigateTo("Register", true);
+            }
+        }
+    }
+
+    async Task CheckMobileAsync(string mobileNumber)
+    {
+        string mobile = await centerService.CheckMobileDuplicacyAsync(mobileNumber);
+        if (mobile.ToLower() != "notfound")
+        {
+            await jS.ShowAlert("Mobile number should be unique, please enter unique number!");
+            UniqueMobile = false;
+        }
+    }
+
+    async Task CheckEmailAsync(string emailAddress)
+    {
+        string email = await centerService.CheckEmailDuplicacyAsync(emailAddress);
+        if (email.ToLower() != "notfound")
+        {
+            await jS.ShowAlert("Email address should be unique, please enter unique email!");
+            UniqueEmail = false;
+        }
+    }
+
+    async Task CheckUsernameAsync(string Username)
+    {
+        string username = await centerService.CheckUsernameDuplicacyAsync(Username);
+        if (username.ToLower() != "notfound")
+        {
+            await jS.ShowAlert("Username should be unique, please enter unique username!");
+            UniqueUsername = false;
+        }
+    }
+}
