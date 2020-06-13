@@ -24,5 +24,9 @@ namespace FriendsForever_App.Services
         Task<ApplicationUser> GetUserByNameAsync(string Name);
 
         Task<string> UpdateUserProfileAsync(EditProfileViewModel model);
+
+        Task<string> UpdateUserProfilePhotoAsync(string[] model);
+
+        Task<IEnumerable<SearchNewFriendViewModel>> SearchNewFriendsAsync();
     }
 }

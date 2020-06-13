@@ -9,17 +9,34 @@
 
         <!-- Middle Column -->
         <div class="col-md-8 col-sm-12 mt-2">
-            <EditProfile isFileUploaded="checkFileUploadOrNot" />
+            <EditProfile isFileUploaded="checkFileUploadOrNot" isInterestAdded="checkUserInterestAddedOrNot" 
+                         isInformationUpdated="checkInformationUpdatedOrNot" />
         </div>
     </div>
 </div>
 
-@code {
 
+@code {
 
     void checkFileUploadOrNot(bool isUploaded)
     {
         if (isUploaded)
+        {
+            navigationManager.NavigateTo("ViewProfile", true);
+        }
+    }
+
+    void checkUserInterestAddedOrNot(bool isAdded)
+    {
+        if (isAdded)
+        {
+            navigationManager.NavigateTo("ViewProfile", true);
+        }
+    }
+
+    async Task checkInformationUpdatedOrNot(bool isUpdated)
+    {
+        if (isUpdated)
         {
             navigationManager.NavigateTo("ViewProfile", true);
         }

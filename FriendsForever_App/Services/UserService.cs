@@ -122,11 +122,46 @@ namespace FriendsForever_App.Services
             var response = await httpClient.SendAsync(requestMessage);
             if (response.IsSuccessStatusCode)
             {
+                var responseData = await response.Content.ReadAsStringAsync();
                 var result = JsonConvert.DeserializeObject<string>(await response.Content.ReadAsStringAsync());
                 return result;
             }
 
             return "Failure";
+        }
+
+        public async Task<string> UpdateUserProfilePhotoAsync(string[] model)
+        {
+            string token = await protectedLocalStorage.GetAsync<string>(TokenKey);
+            string serializedData = JsonConvert.SerializeObject(model);
+            var requestMessage = new HttpRequestMessage(HttpMethod.Post, "UpdateUserProfilePhotoAsync");
+            requestMessage.Content = new StringContent(serializedData);
+            requestMessage.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            requestMessage.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
+            var response = await httpClient.SendAsync(requestMessage);
+            if (response.IsSuccessStatusCode)
+            {
+                var result = JsonConvert.DeserializeObject<string>(await response.Content.ReadAsStringAsync());
+                return result;
+            }
+
+            return "Failure";
+        }
+
+        public async Task<IEnumerable<SearchNewFriendViewModel>> SearchNewFriendsAsync()
+        {
+            string token = await protectedLocalStorage.GetAsync<string>(TokenKey);
+            var requestMessage = new HttpRequestMessage(HttpMethod.Get, "SearchNewFriendsAsync");
+            requestMessage.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
+            var response = await httpClient.SendAsync(requestMessage);
+            IEnumerable<SearchNewFriendViewModel> model = new List<SearchNewFriendViewModel>();
+            if (response.IsSuccessStatusCode)
+            {
+                model = JsonConvert.DeserializeObject<IEnumerable<SearchNewFriendViewModel>>(await response.Content.ReadAsStringAsync());
+                return model;
+            }
+
+            return model;
         }
     }
 }

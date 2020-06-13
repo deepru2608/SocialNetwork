@@ -261,6 +261,48 @@ namespace FriendsForever_Api.Controllers
             return "Failure";
         }
 
+        [HttpPost]
+        [Route("UpdateUserProfilePhotoAsync")]
+        public async Task<ActionResult<string>> UpdateUserProfilePhotoAsync([FromBody] string[] model)
+        {
+            if (model != null)
+            {
+                try
+                {
+                    var user = await userManager.FindByIdAsync(model[0]);
+                    if (user != null)
+                    {
+                        user.ProfilePhotoPath = model[1];
+                        var result = await dbContext.SaveChangesAsync();
+                        return result.ToString();
+                    }
 
+                    return "This user is not registered with us!";
+                }
+                catch (Exception ex)
+                {
+                    return ex.Message;
+                }
+            }
+
+            return "Failure";
+        }
+
+        [HttpGet]
+        [Route("SearchNewFriendsAsync")]
+        public async Task<ActionResult<IEnumerable<SearchNewFriendViewModel>>> SearchNewFriendsAsync()
+        {
+            List<SearchNewFriendViewModel> liSearchNewFriends = new List<SearchNewFriendViewModel>();
+            var usersList = await dbContext.Users.ToListAsync();
+            foreach (var user in usersList)
+            {
+                liSearchNewFriends.Add(new SearchNewFriendViewModel
+                {
+                    FullName = user.FullName,
+                    ProfileImage = user.ProfilePhotoPath
+                });
+            }
+            return liSearchNewFriends;
+        }
     }
 }

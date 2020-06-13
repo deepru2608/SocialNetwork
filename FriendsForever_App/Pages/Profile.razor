@@ -3,9 +3,9 @@
     <!-- Card image -->
     <div class="view view-cascade overlay">
         @{
-            var profilePhotoPath = (model.ProfilePhotoPath ?? "deepuProfile.jpg");
+            var profilePhotoPath = (model.ProfilePhotoPath ?? "Microsoft_Default.png");
         }
-        <img class="card-img-top" src="/Images/ProfileImage/@profilePhotoPath"
+        <img class="card-img-top img-fluid" src="Images/ProfileImage/@profilePhotoPath"
              alt="Card image cap">
         <a>
             <div class="mask rgba-white-slight"></div>

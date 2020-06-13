@@ -269,3 +269,5 @@ C:\Users\deepa\Desktop\Blazor\Social Network College Project\SocialNetwork\Socia
 C:\Users\deepa\Desktop\Blazor\Social Network College Project\SocialNetwork\SocialNetwork\FriendsForever_App\obj\Debug\netcoreapp3.1\Razor\Shared\MainLayout.razor.g.cs
 C:\Users\deepa\Desktop\Blazor\Social Network College Project\SocialNetwork\SocialNetwork\FriendsForever_App\obj\Debug\netcoreapp3.1\Razor\Shared\NavMenu.razor.g.cs
 C:\Users\deepa\Desktop\Blazor\Social Network College Project\SocialNetwork\SocialNetwork\FriendsForever_App\obj\Debug\netcoreapp3.1\Razor\_Imports.razor.g.cs
+C:\Users\deepa\Desktop\Blazor\Social Network College Project\SocialNetwork\SocialNetwork\FriendsForever_App\obj\Debug\netcoreapp3.1\RazorDeclaration\Pages\SearchNewFriends.razor.g.cs
+C:\Users\deepa\Desktop\Blazor\Social Network College Project\SocialNetwork\SocialNetwork\FriendsForever_App\obj\Debug\netcoreapp3.1\Razor\Pages\SearchNewFriends.razor.g.cs

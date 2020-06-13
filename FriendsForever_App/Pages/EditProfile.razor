@@ -9,10 +9,6 @@
             <div class="col-sm-12 mb-2">
                 <!-- Label -->
                 <h5 class="pb-2 pt-1">Upload Profile Image</h5>
-                @*<SfUploader ID="UploadFiles" DropArea=".control-fluid" AllowedExtensions=".png, .jpg, .jpeg, .gif"
-                            MaxFileSize=104857600 AutoUpload="false" OnChange="@(e => UploadProfileImage(e.Value.ToString()))">
-                    <UploaderAsyncSettings SaveUrl="api/Upload/SaveProfile"></UploaderAsyncSettings>
-                </SfUploader>*@
                 <MatFileUpload OnChange="@UploadProfileImage"></MatFileUpload>
             </div>
             <div class="col-sm-12 mb-1">
@@ -22,7 +18,7 @@
                 </div>
             </div>
             <div class="col-sm-12 mb-2">
-                <SfTextBox Placeholder="Enter your interest" Multiline="true" @bind-Value="Interest" FloatLabelType="FloatLabelType.Auto"></SfTextBox>
+                <SfTextBox Placeholder="Enter your interest" Multiline="true" @bind-Value="Interest" FloatLabelType="@FloatLabelType.Auto"></SfTextBox>
             </div>
             <div class="col-sm-12 mb-2">
                 <SfButton IsPrimary="true" OnClick="InsertUserInterestAsync"><i class="fas fa-save"></i>&nbsp;Submit Interest</SfButton>
@@ -33,22 +29,22 @@
             <DataAnnotationsValidator />
             <div class="row">
                 <div class="col-sm-6">
-                    <SfTextBox Placeholder="First Name" @bind-Value="editProfileModel.FirstName" FloatLabelType="FloatLabelType.Auto"></SfTextBox>
+                    <SfTextBox Placeholder="First Name" @bind-Value="editProfileModel.FirstName" FloatLabelType="@FloatLabelType.Auto" Autocomplete="off"></SfTextBox>
                     <ValidationMessage For="@(() => editProfileModel.FirstName)" style="color: red"></ValidationMessage>
                 </div>
                 <div class="col-sm-6">
-                    <SfTextBox Placeholder="Last Name" @bind-Value="editProfileModel.LastName" FloatLabelType="FloatLabelType.Auto"></SfTextBox>
+                    <SfTextBox Placeholder="Last Name" @bind-Value="editProfileModel.LastName" FloatLabelType="@FloatLabelType.Auto" Autocomplete="off"></SfTextBox>
                     <ValidationMessage For="@(() => editProfileModel.LastName)" style="color: red"></ValidationMessage>
                 </div>
                 <div class="col-sm-6">
-                    <SfTextBox Placeholder="Mobile Number" @bind-Value="editProfileModel.MobileNumber" FloatLabelType="FloatLabelType.Auto"></SfTextBox>
+                    <SfTextBox Placeholder="Mobile Number" @bind-Value="editProfileModel.MobileNumber" FloatLabelType="@FloatLabelType.Auto" Autocomplete="off"></SfTextBox>
                     <ValidationMessage For="@(() => editProfileModel.MobileNumber)" style="color: red"></ValidationMessage>
                 </div>
                 <div class="col-sm-6">
-                    <SfTextBox Placeholder="Email Address" @bind-Value="editProfileModel.Email" FloatLabelType="FloatLabelType.Auto"></SfTextBox>
+                    <SfTextBox Placeholder="Email Address" @bind-Value="editProfileModel.Email" FloatLabelType="@FloatLabelType.Auto" Autocomplete="off"></SfTextBox>
                     <ValidationMessage For="@(() => editProfileModel.Email)" style="color: red"></ValidationMessage>
                 </div>
-                <div class="col-sm-12 mb-2">
+                <div class="col-sm-12 mt-3">
                     <SfButton IsPrimary="true"><i class="fas fa-save"></i>&nbsp;Save Details</SfButton>
                     &nbsp;<img src="Images/BlockLoader.gif" style="height: 30px; width: 30px; display: @profileUpdatedLoader" />
                 </div>
@@ -69,8 +65,9 @@
     public EditProfileViewModel editProfileModel { get; set; } = new EditProfileViewModel();
     public string profileUpdatedLoader { get; set; }
     public string globalUserId { get; set; }
-    [Parameter]
-    public EventCallback<bool> isFileUploaded { get; set; }
+    [Parameter] public EventCallback<bool> isFileUploaded { get; set; }
+    [Parameter] public EventCallback<bool> isInterestAdded { get; set; }
+    [Parameter] public EventCallback<bool> isInformationUpdated { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -115,6 +112,8 @@
                     {
                         Loader = "none";
                         await ToastObj.Show(new ToastModel { Title = "Success!", Content = "You has added your interest successfully.", CssClass = "e-toast-success", Icon = "e-success toast-icons" });
+                        await Task.Delay(TimeSpan.FromSeconds(2));
+                        await isInterestAdded.InvokeAsync(true);
                     }
                     else
                     {
@@ -135,6 +134,8 @@
                     {
                         Loader = "none";
                         await ToastObj.Show(new ToastModel { Title = "Success!", Content = "You has added your interest successfully.", CssClass = "e-toast-success", Icon = "e-success toast-icons" });
+                        await Task.Delay(TimeSpan.FromSeconds(2));
+                        await isInterestAdded.InvokeAsync(true);
                     }
                     else
                     {
@@ -154,8 +155,6 @@
             Loader = "none";
             await ToastObj.Show(new ToastModel { Title = "Error!", Content = "Please enter your interests first!", CssClass = "e-toast-danger", Icon = "e-error toast-icons" });
         }
-
-        StateHasChanged();
     }
 
     async Task UpdateUserInformationAsync()
@@ -168,11 +167,14 @@
                 var user = await userService.GetUserDetailsAsync();
                 if (user != null)
                 {
+                    editProfileModel.userId = user.Id;
                     var result = await userService.UpdateUserProfileAsync(editProfileModel);
                     if (result == "1")
                     {
                         Loader = "none";
                         await ToastObj.Show(new ToastModel { Title = "Success!", Content = "Your profile have been updated successfully.", CssClass = "e-toast-success", Icon = "e-success toast-icons" });
+                        await Task.Delay(TimeSpan.FromSeconds(2));
+                        await isInformationUpdated.InvokeAsync(true);
                     }
                     else if (result == "0")
                     {
@@ -213,6 +215,7 @@
         {
             try
             {
+                var user = await userService.GetUserDetailsAsync();
                 var file = files.FirstOrDefault();
                 if (file != null)
                 {
@@ -223,10 +226,14 @@
                     await file.WriteToStreamAsync(memoryStream);
                     using (FileStream fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
                     {
-                        await memoryStream.CopyToAsync(fileStream);
+                        memoryStream.WriteTo(fileStream);
                     }
-
-                    await isFileUploaded.InvokeAsync(true);
+                    string[] sentModel = new string[] { user.Id, uniqueFileName };
+                    var result = await userService.UpdateUserProfilePhotoAsync(sentModel);
+                    if (result == "1")
+                    {
+                        await isFileUploaded.InvokeAsync(true);
+                    }
                 }
                 else
                 {

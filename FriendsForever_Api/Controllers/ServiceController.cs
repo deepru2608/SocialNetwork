@@ -188,7 +188,7 @@ namespace FriendsForever_Api.Controllers
 
         [HttpGet]
         [Route("FindByIdUserInterestAsync")]
-        public async Task<ActionResult<IEnumerable<string>>> FindByIdUserInterestAsync(string userId)
+        public async Task<ActionResult<IEnumerable<string>>> FindByIdUserInterestAsync([FromBody]string userId)
         {
             return await dbContext.UserInterestMaster
                 .Where(w => w.UserId == userId)
