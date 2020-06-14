@@ -1,0 +1,217 @@
+
+
+<a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <i class="fas fa-plus-circle fa-fw mr-1"></i>Create
+</a>
+<div class="dropdown-menu" aria-labelledby="navbarDropdown">
+    <a class="dropdown-item" href="#" @onclick="CreateNewPost"><i class="fas fa-clone fa-fw mr-1"></i>New Post</a>
+    <a class="dropdown-item" href="#" @onclick="CreateNewStory"><i class="fas fa-plus-circle fa-fw mr-1"></i>New Story</a>
+</div>
+
+
+<!-- Used for Notification -->
+<SfToast @ref="NavToastObj" ID="toast_type_navbar">
+    <ToastPosition X="Right"></ToastPosition>
+</SfToast>
+<!-- Used for Notification End -->
+
+<!--Modal: Login with Avatar Form-->
+<div class="modal fade" id="modalLoginAvatar" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog cascading-modal modal-avatar modal-sm" role="document">
+    <!--Content-->
+    <div class="modal-content">
+
+      <!--Header-->
+      <div class="modal-header">
+        <img src="Images/ProfileImage/@User.ProfilePhotoPath" alt="avatar" style="width: 150px; height: 150px;" class="rounded-circle img-responsive">
+      </div>
+      <!--Body-->
+      <div class="modal-body text-center mb-1">
+
+        <h5 class="mt-1 mb-2">@User.FullName</h5>
+
+        <div class="md-form ml-0 mr-0">
+          <input type="text" id="form29" class="form-control form-control-sm validate ml-0" @bind-value="YourStory">
+          <label data-error="wrong" data-success="right" for="form29" class="ml-0">Hi @User.FullName, Write your thought...</label>
+        </div>
+
+        <div class="text-center mt-4">
+          <SfButton IsPrimary="true" OnClick="NewStory"><i class="far fa-paper-plane"></i>&nbsp;&nbsp;Submit</SfButton>
+        </div>
+      </div>
+    </div>
+    <!--/.Content-->
+  </div>
+</div>
+<!--Modal: Login with Avatar Form-->
+
+<!-- New Post Model -->
+<div class="modal fade" id="modalNewPostAvatar" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog cascading-modal modal-avatar modal-md" role="document">
+    <!--Content-->
+    <div class="modal-content">
+
+      <!--Header-->
+      <div class="modal-header">
+        <img src="Images/ProfileImage/@User.ProfilePhotoPath" alt="avatar" style="width: 150px; height: 150px;" class="rounded-circle img-responsive">
+      </div>
+      <!--Body-->
+      <div class="modal-body text-center mb-1">
+
+        <h5 class="mt-1 mb-2">@User.FullName</h5>
+
+        <div class="md-form ml-0 mr-0">
+            <SfUploader ID="UploadFiles" DropArea=".control-fluid" AllowedExtensions=".jpg,.jpeg,.png,.gif,.mp4,.m4v,.mov,.mp3,.aac,.wav">
+                <UploaderEvents ValueChange="UploadPostImage"></UploaderEvents>
+            </SfUploader>
+        </div>
+
+        <div class="md-form ml-0 mr-0">
+          <input type="text" id="PostedContent" class="form-control form-control-sm validate ml-0" @bind-value="PostedContent">
+          <label data-error="wrong" data-success="right" for="form29" class="ml-0">Hi @User.FullName, Write you content..</label>
+        </div>
+
+        <div class="text-center mt-4">
+          <SfButton IsPrimary="true" OnClick="SaveNewPost"><i class="far fa-paper-plane"></i>&nbsp;&nbsp;Submit</SfButton>
+          &nbsp;<img src="Images/BlockLoader.gif" style="height: 30px; width: 30px; display: @Loader" />
+        </div>
+      </div>
+    </div>
+    <!--/.Content-->
+  </div>
+</div>
+<!-- New Post Model End -->
+
+
+@code{
+    SfToast NavToastObj;
+    public ApplicationUser User { get; set; }
+    public string YourStory { get; set; }
+    public string PostedContent { get; set; }
+    public string postId { get; set; }
+    public string Loader { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        User = new ApplicationUser();
+        User = await userService.GetUserDetailsAsync();
+        Loader = "none";
+    }
+
+    async Task CreateNewStory()
+    {
+        await jS.ShowModel("modalLoginAvatar");
+    }
+
+    async Task CreateNewPost()
+    {
+        await jS.ShowModel("modalNewPostAvatar");
+    }
+
+    async Task NewStory()
+    {
+        if (string.IsNullOrEmpty(YourStory))
+        {
+            await NavToastObj.Show(new ToastModel { Title = "Error!", Content = "Invalid request!", CssClass = "e-toast-danger", Icon = "e-error toast-icons" });
+        }
+        else
+        {
+            if (User != null)
+            {
+                string postId = Guid.NewGuid().ToString().GetHashCode().ToString("x");
+                Post post = new Post
+                {
+                    PostedId = postId,
+                    PostedOwnerName = User.FullName,
+                    PostedOwnerPhoto = User.ProfilePhotoPath,
+                    PostedOwnerUserId = User.Id,
+                    PostedContent = YourStory,
+                    PhotoAttached = "Not Attached",
+                    PostedTimeStamp = DateTime.Now
+                };
+                var result = await centerService.InsertNewPostAsync(post);
+                if (result > 0)
+                {
+                    await NavToastObj.Show(new ToastModel { Title = "Success!", Content = "Your story has been created successfully.", CssClass = "e-toast-success", Icon = "e-success toast-icons" });
+                    await Task.Delay(TimeSpan.FromSeconds(2));
+                    navigationManager.NavigateTo("/", true);
+                }
+                else
+                {
+                    await NavToastObj.Show(new ToastModel { Title = "Error!", Content = "Invalid request, please try after sometimes!", CssClass = "e-toast-danger", Icon = "e-error toast-icons" });
+                }
+            }
+        }
+    }
+
+    async Task UploadPostImage(UploadChangeEventArgs args)
+    {
+        if (args.Files.Any())
+        {
+            try
+            {
+                postId = Guid.NewGuid().ToString().GetHashCode().ToString("x");
+                foreach (var file in args.Files)
+                {
+                    var memoryStream = new MemoryStream();
+                    string uniqueFileName = Guid.NewGuid().ToString() + "_" + file.FileInfo.Name;
+                    string postUploadFolder = Path.Combine(hostingEnvironment.WebRootPath, "Images", "PostImages");
+                    string postFilePath = Path.Combine(postUploadFolder, uniqueFileName);
+                    using (FileStream fileStream = new FileStream(postFilePath, FileMode.Create, FileAccess.Write))
+                    {
+                        file.Stream.WriteTo(fileStream);
+                    }
+                    PostImages postImages = new PostImages
+                    {
+                        PostedId = postId,
+                        PostedPhoto = uniqueFileName
+                    };
+                    await centerService.InsertNewPostImagesAsync(postImages);
+                }
+            }
+            catch (Exception ex)
+            {
+                await NavToastObj.Show(new ToastModel { Title = "Error!", Content = ex.Message, CssClass = "e-toast-danger", Icon = "e-error toast-icons" });
+            }
+        }
+    }
+
+    async Task SaveNewPost()
+    {
+        Loader = "inline";
+        try
+        {
+            Post post = new Post
+            {
+                PostedId = postId,
+                PostedOwnerName = User.FullName,
+                PostedOwnerPhoto = User.ProfilePhotoPath,
+                PostedOwnerUserId = User.Id,
+                PostedContent = PostedContent,
+                PhotoAttached = "Attached",
+                PostedTimeStamp = DateTime.Now
+            };
+            var result = await centerService.InsertNewPostAsync(post);
+            if (result > 0)
+            {
+                await NavToastObj.Show(new ToastModel { Title = "Success!", Content = "Your post has been created successfully.", CssClass = "e-toast-success", Icon = "e-success toast-icons" });
+                Loader = "none";
+                await Task.Delay(TimeSpan.FromSeconds(2));
+                navigationManager.NavigateTo("/", true);
+            }
+            else
+            {
+                await NavToastObj.Show(new ToastModel { Title = "Error!", Content = "You are sending invalid request, please try again later!", CssClass = "e-toast-danger", Icon = "e-error toast-icons" });
+                Loader = "none";
+            }
+        }
+        catch (Exception ex)
+        {
+            await NavToastObj.Show(new ToastModel { Title = "Error!", Content = ex.Message, CssClass = "e-toast-danger", Icon = "e-error toast-icons" });
+            Loader = "none";
+        }
+        
+    }
+}

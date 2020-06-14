@@ -27,5 +27,23 @@ namespace FriendsForever_App.Services
         Task<IEnumerable<string>> FindByIdUserInterestAsync(string userId);
 
         Task<int> InsertUserInterestAsync(UserInterest userInterest);
+
+        Task<int> CheckPostTableDataAsync(string userId);
+
+        Task<IEnumerable<Friends>> GetFriendsListByUserIdAsync(string userId);
+
+        Task<IEnumerable<Post>> FindPostByUserIdAsync(List<string> UserIds);
+
+        Task<IEnumerable<PostImages>> FindPostImagesByPostIdAsync(string postedId);
+
+        Task<int> CheckDuplicateLikesAsync(DuplicateLikesViewModel model);
+
+        Task<int> InsertPostLikesAsync(Likes model);
+
+        Task<int> UpdatePostMasterLikesAsync(string postId);
+
+        Task<int> InsertNewPostAsync(Post post);
+
+        Task<int> InsertNewPostImagesAsync(PostImages postImages);
     }
 }

@@ -232,7 +232,37 @@
                     var result = await userService.UpdateUserProfilePhotoAsync(sentModel);
                     if (result == "1")
                     {
-                        await isFileUploaded.InvokeAsync(true);
+                        string postId = Guid.NewGuid().ToString().GetHashCode().ToString("x");
+                        string postUploadFolder = Path.Combine(hostingEnvironment.WebRootPath, "Images", "PostImages");
+                        string postFilePath = Path.Combine(postUploadFolder, uniqueFileName);
+                        using (FileStream fileStream = new FileStream(postFilePath, FileMode.Create, FileAccess.Write))
+                        {
+                            memoryStream.WriteTo(fileStream);
+                        }
+                        PostImages postImages = new PostImages
+                        {
+                            PostedId = postId,
+                            PostedPhoto = uniqueFileName
+                        };
+                        var returnResult = await centerService.InsertNewPostImagesAsync(postImages);
+                        if (returnResult > 0)
+                        {
+                            Post post = new Post
+                            {
+                                PostedId = postId,
+                                PostedOwnerName = user.FullName,
+                                PostedOwnerPhoto = uniqueFileName,
+                                PostedOwnerUserId = user.Id,
+                                PostedContent = null,
+                                PhotoAttached = "Attached",
+                                PostedTimeStamp = DateTime.Now
+                            };
+                            var postResult = await centerService.InsertNewPostAsync(post);
+                            if (postResult > 0)
+                            {
+                                await isFileUploaded.InvokeAsync(true);        
+                            }
+                        }
                     }
                 }
                 else

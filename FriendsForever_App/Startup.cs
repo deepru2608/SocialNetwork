@@ -44,12 +44,12 @@ namespace FriendsForever_App
             services.AddHttpClient();
             services.AddHttpClient<IUserService, UserService>(options =>
             {
-                options.BaseAddress = new Uri("https://localhost:44363/api/Account/");
+                options.BaseAddress = new Uri("https://localhost:5001/api/Account/");
                 options.DefaultRequestHeaders.Add("User-Client", "Friends Forever Account Service");
             });
             services.AddHttpClient<ICenterService, CenterService>(options =>
             {
-                options.BaseAddress = new Uri("https://localhost:44363/api/Service/");
+                options.BaseAddress = new Uri("https://localhost:5001/api/Service/");
                 options.DefaultRequestHeaders.Add("User-Client", "Friends Forever Data Service");
             });
             services.AddScoped<CaptchaService>();
