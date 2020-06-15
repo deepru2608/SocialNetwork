@@ -256,7 +256,7 @@ namespace FriendsForever_App.Services
         {
             string token = await protectedLocalStorage.GetAsync<string>(TokenKey);
             string serializedData = JsonConvert.SerializeObject(model);
-            var requestMessage = new HttpRequestMessage(HttpMethod.Post, "DuplicateLikesViewModel");
+            var requestMessage = new HttpRequestMessage(HttpMethod.Post, "CheckDuplicateLikesAsync");
             requestMessage.Content = new StringContent(serializedData);
             requestMessage.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
             requestMessage.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
@@ -336,6 +336,120 @@ namespace FriendsForever_App.Services
             requestMessage.Content = new StringContent(serializedData);
             requestMessage.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
             requestMessage.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
+            var response = await httpClient.SendAsync(requestMessage);
+            int result = 0;
+            if (response.IsSuccessStatusCode)
+            {
+                result = JsonConvert.DeserializeObject<int>(await response.Content.ReadAsStringAsync());
+                return result;
+            }
+
+            return result;
+        }
+
+        public async Task<IEnumerable<string>> FindAllProfilePhotosAsync(string userId)
+        {
+            string token = await protectedLocalStorage.GetAsync<string>(TokenKey);
+            string serializedData = JsonConvert.SerializeObject(userId);
+            var requestMessage = new HttpRequestMessage(HttpMethod.Post, "FindAllProfilePhotosAsync");
+            requestMessage.Content = new StringContent(serializedData);
+            requestMessage.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            requestMessage.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
+            var response = await httpClient.SendAsync(requestMessage);
+            IEnumerable<string> result = new List<string>();
+            if (response.IsSuccessStatusCode)
+            {
+                result = JsonConvert.DeserializeObject<IEnumerable<string>>(await response.Content.ReadAsStringAsync());
+                return result;
+            }
+
+            return result;
+        }
+
+        public async Task<bool> CheckFriendRequestSentOrNotAsync(CheckFriendRequestStatusViewModel model)
+        {
+            string token = await protectedLocalStorage.GetAsync<string>(TokenKey);
+            string serializedData = JsonConvert.SerializeObject(model);
+            var requestMessage = new HttpRequestMessage(HttpMethod.Post, "CheckFriendRequestSentOrNotAsync");
+            requestMessage.Content = new StringContent(serializedData);
+            requestMessage.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            requestMessage.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
+            var response = await httpClient.SendAsync(requestMessage);
+            bool result = false;
+            if (response.IsSuccessStatusCode)
+            {
+                result = JsonConvert.DeserializeObject<bool>(await response.Content.ReadAsStringAsync());
+                return result;
+            }
+
+            return result;
+        }
+
+        public async Task<Post> FindPostDetailsByIdAsync(string postId)
+        {
+            string token = await protectedLocalStorage.GetAsync<string>(TokenKey);
+            string serializedData = JsonConvert.SerializeObject(postId);
+            var requestMessage = new HttpRequestMessage(HttpMethod.Post, "FindPostDetailsByIdAsync");
+            requestMessage.Content = new StringContent(serializedData);
+            requestMessage.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            requestMessage.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
+            var response = await httpClient.SendAsync(requestMessage);
+            Post result = new Post();
+            if (response.IsSuccessStatusCode)
+            {
+                result = JsonConvert.DeserializeObject<Post>(await response.Content.ReadAsStringAsync());
+                return result;
+            }
+
+            return result;
+        }
+
+        public async Task<IEnumerable<Comments>> GetCommentsListByPostIdAsync(string postId)
+        {
+            string token = await protectedLocalStorage.GetAsync<string>(TokenKey);
+            string serializedData = JsonConvert.SerializeObject(postId);
+            var requestMessage = new HttpRequestMessage(HttpMethod.Post, "GetCommentsListByPostIdAsync");
+            requestMessage.Content = new StringContent(serializedData);
+            requestMessage.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            requestMessage.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
+            var response = await httpClient.SendAsync(requestMessage);
+            IEnumerable<Comments> result = new List<Comments>();
+            if (response.IsSuccessStatusCode)
+            {
+                result = JsonConvert.DeserializeObject<IEnumerable<Comments>>(await response.Content.ReadAsStringAsync());
+                return result;
+            }
+
+            return result;
+        }
+
+        public async Task<int> InsertPostCommentsAsync(Comments comment)
+        {
+            //string token = await protectedLocalStorage.GetAsync<string>(TokenKey);
+            string serializedData = JsonConvert.SerializeObject(comment);
+            var requestMessage = new HttpRequestMessage(HttpMethod.Post, "InsertPostCommentsAsync");
+            requestMessage.Content = new StringContent(serializedData);
+            requestMessage.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            //requestMessage.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
+            var response = await httpClient.SendAsync(requestMessage);
+            int result = 0;
+            if (response.IsSuccessStatusCode)
+            {
+                result = JsonConvert.DeserializeObject<int>(await response.Content.ReadAsStringAsync());
+                return result;
+            }
+
+            return result;
+        }
+
+        public async Task<int> UpdatePostMasterCommentsAsync(string postId)
+        {
+            //string token = await protectedLocalStorage.GetAsync<string>(TokenKey);
+            string serializedData = JsonConvert.SerializeObject(postId);
+            var requestMessage = new HttpRequestMessage(HttpMethod.Post, "UpdatePostMasterCommentsAsync");
+            requestMessage.Content = new StringContent(serializedData);
+            requestMessage.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            //requestMessage.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
             var response = await httpClient.SendAsync(requestMessage);
             int result = 0;
             if (response.IsSuccessStatusCode)

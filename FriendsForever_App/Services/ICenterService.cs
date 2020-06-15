@@ -45,5 +45,17 @@ namespace FriendsForever_App.Services
         Task<int> InsertNewPostAsync(Post post);
 
         Task<int> InsertNewPostImagesAsync(PostImages postImages);
+
+        Task<IEnumerable<string>> FindAllProfilePhotosAsync(string userId);
+
+        Task<bool> CheckFriendRequestSentOrNotAsync(CheckFriendRequestStatusViewModel model);
+
+        Task<Post> FindPostDetailsByIdAsync(string postId);
+
+        Task<IEnumerable<Comments>> GetCommentsListByPostIdAsync(string postId);
+
+        Task<int> InsertPostCommentsAsync(Comments comment);
+
+        Task<int> UpdatePostMasterCommentsAsync(string postId);
     }
 }

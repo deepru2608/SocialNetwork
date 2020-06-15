@@ -41,6 +41,7 @@
 
         <!-- Button -->
         <SfButton IsPrimary="true" Content="View Profile" OnClick="ViewUserProfile"></SfButton>
+        <SfButton IsPrimary="true" Content="Gallery" OnClick="ViewGallery"></SfButton>
     </div>
 </div>
 <!-- Card Narrower -->
@@ -70,5 +71,14 @@
     private void ViewUserProfile()
     {
         navigationManager.NavigateTo(nameof(ViewProfile), true);
+    }
+
+    async Task ViewGallery()
+    {
+        var user = await userService.GetUserDetailsAsync();
+        if (user != null)
+        {
+            navigationManager.NavigateTo(Path.Combine(nameof(Gallery), user.Id), true);
+        }
     }
 }

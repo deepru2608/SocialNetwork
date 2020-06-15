@@ -184,7 +184,8 @@
     <div class="card-body card-body-cascade">
         <div class="row">
             <div class="col-sm-12">
-                <SfAutoComplete TValue="string" TItem="SearchNewFriendViewModel" cssClass="template" Placeholder="Search New Friends" DataSource="@searchFriendsDataSource">
+                <SfAutoComplete TValue="string" TItem="SearchNewFriendViewModel" cssClass="template" 
+                Placeholder="Search New Friends" DataSource="@searchFriendsDataSource" @bind-Value="@searchValue">
                     <AutoCompleteTemplates TItem="SearchNewFriendViewModel">
                         <ItemTemplate>
                             <div>
@@ -204,15 +205,21 @@
                 </SfAutoComplete>
             </div>
             <div class="col-sm-12 mt-2">
-                <SfButton IsPrimary="true" Content="Search"></SfButton>
+                <SfButton IsPrimary="true" OnClick="SearchFriends">&nbsp;&nbsp;Search</SfButton>
             </div>
         </div>
     </div>
 </div>
 
+<SfToast @ref="ToastObjSearch" ID="toast_type_search">
+    <ToastPosition X="Right"></ToastPosition>
+</SfToast>
+
 @code {
+    SfToast ToastObjSearch;
     public SearchNewFriendViewModel searchModel { get; set; }
     public IEnumerable<SearchNewFriendViewModel> searchFriendsDataSource { get; set; } = new List<SearchNewFriendViewModel>();
+    public string searchValue { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -222,6 +229,19 @@
 
     async Task LoadSearchNewFriends()
     {
-        searchFriendsDataSource = await userService.SearchNewFriendsAsync();
+        var user = await userService.GetUserDetailsAsync();
+        searchFriendsDataSource = await userService.SearchNewFriendsAsync(user.Id);
+    }
+
+    async Task SearchFriends()
+    {
+        if (string.IsNullOrEmpty(searchValue))
+        {
+            await ToastObjSearch.Show(new ToastModel { Title = "Error!", Content = "Please enter the friend name first!", CssClass = "e-toast-danger", Icon = "e-error toast-icons" });
+        }
+        else
+        {
+            navigationManager.NavigateTo(Path.Combine(nameof(ViewFriendsProfile), searchValue), true);
+        }
     }
 }

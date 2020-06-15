@@ -35,15 +35,15 @@
                 <div class="pb-2">
                     <div class="customHoverEffect">
                         <p>
-                            <img src="/Images/ProfileImage/@photoData" alt="Avatar"
+                            <img src="Images/ProfileImage/@photoData" alt="Avatar"
                                  class="rounded-circle" style="width: 35px;height: 35px;">&nbsp;<span style="font-size: 13px;">Deepanshu</span>
                         </p>
                         <div class="row">
                             <div class="col-md-6">
-                                <SfButton IsPrimary="true" Content="Accept" OnClick="(e => AcceptFriendRequest(friends.EncryptFullName))"></SfButton>
+                                <SfButton IsPrimary="true" Content="Accept" OnClick="@(e => AcceptFriendRequest(friends.EncryptFullName))"></SfButton>
                             </div>
                             <div class="col-md-6">
-                                <SfButton IsPrimary="true" Content="Reject" OnClick="(e => RejectFriendRequest(friends.EncryptFullName))"></SfButton>
+                                <SfButton IsPrimary="true" Content="Reject" OnClick="@(e => RejectFriendRequest(friends.EncryptFullName))"></SfButton>
                             </div>
                         </div>
                     </div>
@@ -53,7 +53,12 @@
     </div>
 </div>
 
+<SfToast @ref="RequestToastObj" ID="toast_type_request">
+    <ToastPosition X="Right"></ToastPosition>
+</SfToast>
+
 @code {
+    SfToast RequestToastObj;
     public IEnumerable<ShowFriendsReuqestData> NewFriendsRequest = new List<ShowFriendsReuqestData>();
     private IDataProtector dataProtector;
 
@@ -101,13 +106,15 @@
                 if (result > 0)
                 {
                     string message = $"You have accepted {friendRequestUser.FullName} request succesfully.";
-                    await jS.ShowAlert("Well Done!", message, SweetAlertMessageType.success);
+                    await RequestToastObj.Show(new ToastModel { Title = "Success!", Content = message, CssClass = "e-toast-success", Icon = "e-success toast-icons" });
+                    await Task.Delay(TimeSpan.FromSeconds(2));
                     navigationManager.NavigateTo("/", true);
                 }
                 else
                 {
                     string message = "We are facing some technical issue, please try again later!";
-                    await jS.ShowAlert("Oops!", message, SweetAlertMessageType.error);
+                    await RequestToastObj.Show(new ToastModel { Title = "Error!", Content = message, CssClass = "e-toast-danger", Icon = "e-error toast-icons" });
+                    await Task.Delay(TimeSpan.FromSeconds(2));
                     navigationManager.NavigateTo("/", true);
                 }
             }
@@ -133,13 +140,15 @@
             if (result > 0)
             {
                 string message = $"You have rejected {friendSenderUser.FullName} request succesfully.";
-                await jS.ShowAlert("Well Done!", message, SweetAlertMessageType.success);
+                await RequestToastObj.Show(new ToastModel { Title = "Success!", Content = message, CssClass = "e-toast-success", Icon = "e-success toast-icons" });
+                await Task.Delay(TimeSpan.FromSeconds(2));
                 navigationManager.NavigateTo("/", true);
             }
             else
             {
                 string message = "We are facing some technical issue, please try again later!";
-                await jS.ShowAlert("Oops!", message, SweetAlertMessageType.error);
+                await RequestToastObj.Show(new ToastModel { Title = "Error!", Content = message, CssClass = "e-toast-danger", Icon = "e-error toast-icons" });
+                await Task.Delay(TimeSpan.FromSeconds(2));
                 navigationManager.NavigateTo("/", true);
             }
         }

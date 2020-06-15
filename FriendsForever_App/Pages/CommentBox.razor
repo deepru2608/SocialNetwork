@@ -1,0 +1,335 @@
+﻿@page "/CommentBox/{postId}"
+
+<div class="main">
+    <div class="row">
+        <!-- Left Column -->
+        <div class="col-md-4 col-sm-12 mt-2">
+            <Profile />
+        </div>
+
+        <!-- Middle Column -->
+        <div class="col-md-8 col-sm-12 mt-2">
+            @if (PostsDetails != null)
+            {
+                var postedOwnerPhoto = (PostsDetails.PostedOwnerPhoto ?? "Microsoft_Default.png");
+                if (PostsDetails.PhotoAttached == "Attached")
+                {
+                    var postImageCount = PostPhotoCount.FirstOrDefault(f => f.PostedId == PostsDetails.PostedId);
+                    IEnumerable<PostImages> allPhotos = AllPhotos.Where(w => w.PostedId == PostsDetails.PostedId);
+                    <div class="card card-cascade narrower mt-3">
+                        <!-- Card content -->
+                        <div class="card-body card-body-cascade">
+                            <div class="d-flex">
+                                <div class="p-1">
+                                    <img src="Images/ProfileImage/@postedOwnerPhoto" alt="Avatar" class="text-left rounded-circle" style="width:50px; height: 50px;">
+                                </div>
+                                <div class="p-1 mt-2">
+                                    <h4>@PostsDetails.PostedOwnerName</h4>
+                                </div>
+                                <div class="ml-auto p-2">
+                                    <span class="text-right">@( DateTime.Now.Subtract(PostsDetails.PostedTimeStamp).Minutes ) mins</span>
+                                </div>
+                            </div>
+                            <hr class="bg-secondary" />
+                            <p>@PostsDetails.PostedContent</p>
+                            <div class="scrollOptions-Post">
+                                @foreach (var images in allPhotos)
+                                {
+                                    var photoPath = (images.PostedPhoto ?? "Microsoft_Default.png");
+                                    string[] checkContent = photoPath.Split('.');
+                                    if (checkContent[checkContent.Length - 1].ToLower() == "png" || checkContent[checkContent.Length - 1].ToLower() == "jpg"
+                                        || checkContent[checkContent.Length - 1].ToLower() == "jpeg" || checkContent[checkContent.Length - 1].ToLower() == "gif")
+                                    {
+                                        <img src="Images/PostImages/@photoPath" style="width:100%" alt="@checkContent[0]" class="p-1">
+                                    }
+                                    else if (checkContent[checkContent.Length - 1].ToLower() == "mp4" || checkContent[checkContent.Length - 1].ToLower() == "m4v"
+                                    || checkContent[checkContent.Length - 1].ToLower() == "m4v" || checkContent[checkContent.Length - 1].ToLower() == "mov")
+                                    {
+                                        <video controls>
+                                            <source src="Images/PostImages/@photoPath" type="video/@checkContent[checkContent.Length - 1].ToLower()">
+                                            Your browser does not support the video tag.
+                                        </video>
+                                    }
+                                    else if (checkContent[checkContent.Length - 1].ToLower() == "mp3" || checkContent[checkContent.Length - 1].ToLower() == "wav"
+                                        || checkContent[checkContent.Length - 1].ToLower() == "aac")
+                                    {
+                                        <audio controls>
+                                            <source src="Images/PostImages/@photoPath" type="audio/@checkContent[checkContent.Length - 1].ToLower()">
+                                            Your browser does not support the audio element.
+                                        </audio>
+                                    }
+                                }
+                            </div>
+                            <hr class="bg-secondary" />
+                            <div class="d-flex">
+                                <div class="p-1">
+                                    <span class="mr-auto" style="font-size:16px"><i class="far fa-thumbs-up" style="color:#4834DF"></i> @PostsDetails.LikesCount</span>&nbsp;&nbsp;
+                                </div>
+                                <div class="p-1">
+                                    <span class="ml-auto" style="font-size:16px"><i class="far fa-comment-alt" style="color:#4834DF"></i> @PostsDetails.CommentsCount</span>
+                                </div>
+                            </div>
+                            <div class="d-flex">
+                                <div class="p-1">
+                                    <SfButton IsPrimary="true" OnClick="@(e => InsertLikes(PostsDetails.PostedId))"><i class="fa fa-thumbs-up"></i>&nbsp;&nbsp;Like</SfButton>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="card card-cascade narrower mt-3">
+                        <!-- Card content -->
+                        <div class="card-body card-body-cascade">
+                            <div class="d-flex">
+                                <div class="p-1">
+                                    <img src="Images/ProfileImage/@postedOwnerPhoto" alt="Avatar" class="text-left rounded-circle" style="width:50px; height: 50px;">
+                                </div>
+                                <div class="p-1 mt-2">
+                                    <h4>@PostsDetails.PostedOwnerName</h4>
+                                </div>
+                                <div class="ml-auto p-2">
+                                    <span class="text-right">@( DateTime.Now.Subtract(PostsDetails.PostedTimeStamp).Minutes ) mins</span>
+                                </div>
+                            </div>
+                            <hr class="bg-secondary" />
+                            <p> @PostsDetails.PostedContent </p>
+                            <hr class="bg-secondary" />
+                            <div class="d-flex">
+                                <div class="p-1">
+                                    <span class="mr-auto" style="font-size:16px"><i class="far fa-thumbs-up" style="color:#4834DF"></i> @PostsDetails.LikesCount</span>&nbsp;&nbsp;
+                                </div>
+                                <div class="p-1">
+                                    <span class="ml-auto" style="font-size:16px"><i class="far fa-comment-alt" style="color:#4834DF"></i> @PostsDetails.CommentsCount</span>
+                                </div>
+                            </div>
+                            <div class="d-flex">
+                                <div class="p-1">
+                                    <SfButton IsPrimary="true" OnClick="@(e => InsertLikes(PostsDetails.PostedId))"><i class="fa fa-thumbs-up"></i>&nbsp;&nbsp;Like</SfButton>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <p class="card-text">No PostsDetails available.</p>
+            }
+
+            <div class="widget-area no-padding blank">
+                <div class="status-upload mb-1 p-1">
+                    @if (ShowCommentsList.Any())
+                    {
+                        foreach (var comment in ShowCommentsList)
+                        {
+                            var postedOwnerPhoto = (comment.OwnerProfile ?? "Microsoft_Default.png");
+                            if (signInUserName.ToLower() == comment.OwnerName.ToLower())
+                            {
+                                <div class="row mb-3">
+                                    <div class="col-sm-11">
+                                        <div style="background-color: #EAF0F1; border-radius: 10px; padding: 10px; line-height:40%">
+                                            <h5><b>@comment.OwnerName</b></h5><br>
+                                            <p>@comment.UserComment</p>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-1">
+                                        <div class="mr-2">
+                                            <img src="Images/ProfileImage/@postedOwnerPhoto" alt="Avatar"
+                                                class="rounded-circle" style="width:40px; height: 40px;">
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="row mb-3">
+                                    <div class="col-sm-1">
+                                        <div class="mr-2">
+                                            <img src="Images/ProfileImage/@postedOwnerPhoto" alt="Avatar"
+                                                class="rounded-circle" style="width:40px; height: 40px;">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-11">
+                                        <div style="background-color: #EAF0F1; border-radius: 10px; padding: 10px; line-height:40%">
+                                            <h5><b>@comment.OwnerName</b></h5><br>
+                                            <p>@comment.UserComment</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        }
+                    }
+                    else
+                    {
+                        <div class="row mb-3">
+                            <div class="col-sm-12 text-center">
+                                <h5 class="text-info">No comments posted yet on this post.</h5>
+                            </div>
+                        </div>
+                    }
+
+                </div>
+                <div class="status-upload">
+                    <form>
+                        <SfTextBox Placeholder="Enter your comments" @bind-Value="@CommentBoxArea" Multiline="true"></SfTextBox>
+                        <SfButton IsPrimary="true" OnClick="@(e => InsertComments(PostsDetails.PostedId))"><i class="fa fa-share"></i>&nbsp;&nbsp;Share</SfButton>
+                    </form>
+                </div><!-- Status Upload  -->
+            </div><!-- Widget Area -->
+        </div>
+    </div>
+</div>
+
+<SfToast @ref="CommentToastObj" ID="toast_type_comment">
+    <ToastPosition X="Right"></ToastPosition>
+</SfToast>
+
+
+@code {
+    SfToast CommentToastObj;
+    [Parameter]
+    public string postId { get; set; }
+    public string CommentBoxArea { get; set; }
+    public IEnumerable<PostImages> AllPhotos = new List<PostImages>();
+    public List<CountPostImages> PostPhotoCount = new List<CountPostImages>();
+    public Post PostsDetails = new Post();
+    public IEnumerable<ShowCommentsViewModel> ShowCommentsList = new List<ShowCommentsViewModel>();
+    public string signInUserName { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        List<string> UserIdList = new List<string>();
+        var user = await userService.GetUserDetailsAsync();
+        int count = await centerService.CheckPostTableDataAsync(user.Id);
+        if (count > 0)
+        {
+            signInUserName = user.FullName;
+            PostsDetails = await centerService.FindPostDetailsByIdAsync(postId);
+            List<PostImages> postImagesList = new List<PostImages>();
+            var result = await centerService.FindPostImagesByPostIdAsync(PostsDetails.PostedId);
+            PostPhotoCount.Add(new CountPostImages
+            {
+                PostedId = PostsDetails.PostedId,
+                PostPhotoCount = result.Count()
+            });
+            foreach (var postImages in result)
+            {
+                PostImages postImages1 = new PostImages
+                {
+                    Id = postImages.Id,
+                    PostedId = postImages.PostedId,
+                    PostedPhoto = postImages.PostedPhoto
+                };
+                postImagesList.Add(postImages1);
+            }
+            AllPhotos = postImagesList;
+        }
+
+        IEnumerable<Comments> CommentsList = await centerService.GetCommentsListByPostIdAsync(postId);
+        List<ShowCommentsViewModel> model = new List<ShowCommentsViewModel>();
+        foreach (var comment in CommentsList)
+        {
+            ShowCommentsViewModel showComments = new ShowCommentsViewModel();
+            showComments.Id = comment.Id;
+            showComments.UserComment = comment.Comment;
+            string commentedUserId = comment.CommentedUserId;
+            var commentedUserDetails = await userService.GetUserByIdAsync(commentedUserId);
+            showComments.OwnerName = commentedUserDetails.FullName;
+            showComments.OwnerProfile = commentedUserDetails.ProfilePhotoPath;
+            model.Add(showComments);
+        }
+
+        ShowCommentsList = model;
+    }
+
+    async Task InsertLikes(string postId)
+    {
+        var user = await userService.GetUserDetailsAsync();
+        var duplicateLikes = new DuplicateLikesViewModel()
+        {
+            userId = user.Id,
+            postId = postId
+        };
+        var count = await centerService.CheckDuplicateLikesAsync(duplicateLikes);
+        if (count > 0)
+        {
+            await CommentToastObj.Show(new ToastModel { Title = "Error!", Content = "You have already liked it!", CssClass = "e-toast-danger", Icon = "e-error toast-icons" });
+        }
+        else
+        {
+            var newLike = new Likes
+            {
+                PostedId = postId,
+                LikeUserId = user.Id,
+                LikeTimeStamp = DateTime.Now
+            };
+            var result = await centerService.InsertPostLikesAsync(newLike);
+            if (result > 0)
+            {
+                var likeUpdation = await centerService.UpdatePostMasterLikesAsync(postId);
+                if (likeUpdation > 0)
+                {
+                    await CommentToastObj.Show(new ToastModel { Title = "Success!", Content = "Like updated successfully.", CssClass = "e-toast-success", Icon = "e-success toast-icons" });
+                    var post = await centerService.FindPostDetailsByIdAsync(postId);
+                    if (post != null)
+                    {
+                        if (PostsDetails.PostedId == post.PostedId)
+                        {
+                            PostsDetails.LikesCount = post.LikesCount;
+                            PostsDetails.CommentsCount = post.CommentsCount;
+                        }
+                    }
+                }
+                else
+                {
+                    await CommentToastObj.Show(new ToastModel { Title = "Error!", Content = "No updation pending!", CssClass = "e-toast-danger", Icon = "e-error toast-icons" });
+                }
+            }
+            else
+            {
+                await CommentToastObj.Show(new ToastModel { Title = "Error!", Content = "Invalid request, please try after sometimes!", CssClass = "e-toast-danger", Icon = "e-error toast-icons" });
+            }
+        }
+
+        await Task.Delay(TimeSpan.FromSeconds(2));
+        StateHasChanged();
+    }
+
+    async Task InsertComments(string postId)
+    {
+        var user = await userService.GetUserDetailsAsync();
+        if (string.IsNullOrEmpty(CommentBoxArea))
+        {
+            await jS.ShowAlert("Please enter your comment first!");
+        }
+        else
+        {
+            var newComment = new Comments
+            {
+                PostedId = postId,
+                CommentedUserId = user.Id,
+                Comment = CommentBoxArea,
+                CommentedTimeStamp = DateTime.Now
+            };
+            var result = await centerService.InsertPostCommentsAsync(newComment);
+            if (result > 0)
+            {
+                var commentUpdation = await centerService.UpdatePostMasterCommentsAsync(postId);
+                if (commentUpdation > 0)
+                {
+                    StateHasChanged();
+                }
+                else
+                {
+                    await jS.ShowAlert("No updation pending!");
+                }
+            }
+            else
+            {
+                await jS.ShowAlert("Invalid request, please try after sometimes!");
+            }
+        }
+    }
+}

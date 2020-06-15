@@ -34,9 +34,9 @@
                 var photoData = (friends.ProfilePhotoPath ?? "Microsoft_Default.png");
                 <div class="pb-2">
                     <div class="customHoverEffect">
-                        <a class="friendListA" @onclick="(e => ViewFriendProfile(friends.EncryptFullName))">
+                        <a class="friendListA" @onclick="(e => ViewFriendProfile(friends.FriendFullName))">
                             <p>
-                                <img src="/Images/ProfileImage/@photoData" alt="Avatar"
+                                <img src="Images/ProfileImage/@photoData" alt="Avatar"
                                      class="rounded-circle" style="width: 35px;height: 35px;">&nbsp;
                                 <span style="font-size: 12px;">@friends.FriendFullName</span>
                             </p>
@@ -64,9 +64,8 @@
         }
     }
 
-    private void ViewFriendProfile(string encName)
+    private void ViewFriendProfile(string fullName)
     {
-        string UriPath = $"/Home/FriendsViewProfile?encName={encName}";
-        navigationManager.NavigateTo(UriPath, true);
+        navigationManager.NavigateTo(Path.Combine(nameof(ViewFriendsProfile), fullName), true);
     }
 }

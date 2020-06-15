@@ -1,0 +1,21 @@
+@page "/ViewFriendsProfile/{fullName}"
+
+<div class="main">
+    <div class="row">
+        <!-- Left Column -->
+        <div class="col-md-4 col-sm-12 mt-2">
+            <FriendsProfile FullName = "@fullName" />
+        </div>
+
+        <!-- Middle Column -->
+        <div class="col-md-8 col-sm-12 mt-2">
+            <FriendsGallery FullName="@fullName" />
+        </div>
+    </div>
+</div>
+
+
+@code{
+    [Parameter]
+    public string fullName { get; set; }
+}

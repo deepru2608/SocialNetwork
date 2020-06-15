@@ -232,6 +232,13 @@ namespace FriendsForever_Api.Controllers
         }
 
         [HttpPost]
+        [Route("GetUserByIdAsync")]
+        public async Task<ActionResult<ApplicationUser>> GetUserByIdAsync([FromBody] string userId)
+        {
+            return await dbContext.Users.FirstOrDefaultAsync(f => f.Id == userId);
+        }
+
+        [HttpPost]
         [Route("UpdateUserProfileAsync")]
         public async Task<ActionResult<string>> UpdateUserProfileAsync([FromBody] EditProfileViewModel model)
         {
@@ -288,12 +295,12 @@ namespace FriendsForever_Api.Controllers
             return "Failure";
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("SearchNewFriendsAsync")]
-        public async Task<ActionResult<IEnumerable<SearchNewFriendViewModel>>> SearchNewFriendsAsync()
+        public async Task<ActionResult<IEnumerable<SearchNewFriendViewModel>>> SearchNewFriendsAsync([FromBody] string userId)
         {
             List<SearchNewFriendViewModel> liSearchNewFriends = new List<SearchNewFriendViewModel>();
-            var usersList = await dbContext.Users.ToListAsync();
+            var usersList = await dbContext.Users.Where(w => w.Id != userId).ToListAsync();
             foreach (var user in usersList)
             {
                 liSearchNewFriends.Add(new SearchNewFriendViewModel

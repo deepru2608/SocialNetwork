@@ -1,0 +1,71 @@
+
+@if (GalleryData.Any())
+{
+    <div class="row">
+        @foreach (var Images in GalleryData)
+        {
+            var photo = (Images ?? "Microsoft_Default.png");
+            string[] checkContent = photo.Split('.');
+            if (checkContent[checkContent.Length - 1].ToLower() == "png" || checkContent[checkContent.Length - 1].ToLower() == "jpg"
+            || checkContent[checkContent.Length - 1].ToLower() == "jpeg" || checkContent[checkContent.Length - 1].ToLower() == "gif")
+            {
+                <div class="col-sm-4 p-3">
+                    <div class="card">
+                        <img class="card-img img-fluid" src="Images/PostImages/@photo" alt="Card image"
+                                            style="width: 100%; height: 100%">
+                    </div>
+                </div>
+            }
+            else if (checkContent[checkContent.Length - 1].ToLower() == "mp4" || checkContent[checkContent.Length - 1].ToLower() == "m4v"
+            || checkContent[checkContent.Length - 1].ToLower() == "m4v" || checkContent[checkContent.Length - 1].ToLower() == "mov")
+            {
+                <div class="col-sm-4 p-3">
+                    <div class="card">
+                        <video width="320" height="240" controls>
+                            <source src="Images/PostImages/@photo" type="video/@checkContent[checkContent.Length - 1].ToLower()">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                </div>
+            }
+            else if (checkContent[checkContent.Length - 1].ToLower() == "mp3" || checkContent[checkContent.Length - 1].ToLower() == "wav"
+            || checkContent[checkContent.Length - 1].ToLower() == "aac")
+            {
+                <div class="col-sm-4 p-3">
+                    <div class="card">
+                        <audio controls>
+                            <source src="Images/PostImages/@photo" type="audio/@checkContent[checkContent.Length - 1].ToLower()">
+                            Your browser does not support the audio element.
+                        </audio>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+}
+else
+{
+    <p>No photo available.</p>
+}
+
+@code{
+    [Parameter]
+    public string FullName { get; set; }
+    public IEnumerable<string> GalleryData { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        GalleryData = new List<string>();
+        await LoadUserGallery();
+    }
+
+    async Task LoadUserGallery()
+    {
+        var user = await userService.GetUserByNameAsync(FullName);
+        if (user != null)
+        {
+            GalleryData = await centerService.FindAllProfilePhotosAsync(user.Id);
+        }
+    }
+
+}

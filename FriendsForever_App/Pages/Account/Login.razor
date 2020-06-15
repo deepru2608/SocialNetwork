@@ -25,15 +25,13 @@
                         <div class="col-sm-12 col-md-12 col-lg-12">
                             <div class="col-sm-12">
                                 <div class="form-group">
-                                    <SfTextBox CssClass="e-outline" Placeholder="Username" FloatLabelType="@FloatLabelType.Auto"
-                                               @bind-Value="loginModel.Username"></SfTextBox>
+                                    <InputText class="form-control form-control-sm" placeholder="Username" @bind-Value="loginModel.Username"></InputText>
                                     <ValidationMessage For="@(() => loginModel.Username)" style="color: red" />
                                 </div>
                             </div>
                             <div class="col-sm-12">
                                 <div class="form-group">
-                                    <SfTextBox CssClass="e-outline" Placeholder="Password" FloatLabelType="@FloatLabelType.Auto"
-                                               @bind-Value="loginModel.Password" Type="password"></SfTextBox>
+                                    <InputText type="Password" class="form-control form-control-sm" placeholder="Password" @bind-Value="loginModel.Password"></InputText>
                                     <ValidationMessage For="@(() => loginModel.Password)" style="color: red" />
                                 </div>
                             </div>
@@ -76,7 +74,12 @@
 </div>
 <!-- Card Regular -->
 
+<SfToast @ref="ToastObj" ID="toast_type_login">
+    <ToastPosition X="Right"></ToastPosition>
+</SfToast>
+
 @code {
+    SfToast ToastObj;
     public ReCAPTCHA reCAPTCHAComponent;
     public bool ValidReCAPTCHA = false;
 
@@ -120,30 +123,44 @@
                 var captchaResponse = await captchaService.GetCaptchaVerification(args);
                 if (captchaResponse == "success")
                 {
-                    var userToken = await userService.LoginUserAsync(loginModel);
-                    if (userToken.Status.ToLower() == "success")
+                    if (!string.IsNullOrEmpty(loginModel.Username) && !string.IsNullOrEmpty(loginModel.Password))
                     {
-                        await loginService.Login(userToken.Token);
-                        Loader = "none";
-                        navigationManager.NavigateTo("/", true);
+                        var userToken = await userService.LoginUserAsync(loginModel);
+                        if (userToken.Status.ToLower() == "success")
+                        {
+                            Loader = "none";
+                            await loginService.Login(userToken.Token);
+                            await ToastObj.Show(new ToastModel { Title = "Error!", Content = userToken.Status, CssClass = "e-toast-danger", Icon = "e-error toast-icons" });
+                            await Task.Delay(TimeSpan.FromSeconds(2));
+                            navigationManager.NavigateTo("/", true);
+                        }
+                        else
+                        {
+                            Loader = "none";
+                            await ToastObj.Show(new ToastModel { Title = "Error!", Content = userToken.Status, CssClass = "e-toast-danger", Icon = "e-error toast-icons" });
+                            await Task.Delay(TimeSpan.FromSeconds(2));
+                            navigationManager.NavigateTo("Login", true);
+                        }                        
                     }
                     else
                     {
-                        await jS.ShowAlert(userToken.Status);
-                        Loader = "none";
-                        navigationManager.NavigateTo("Login", true);
+                        await ToastObj.Show(new ToastModel { Title = "Error!", Content = "Please fill all the details!", CssClass = "e-toast-danger", Icon = "e-error toast-icons" });
+                        await Task.Delay(TimeSpan.FromSeconds(2));
+                        navigationManager.NavigateTo("Login", true);    
                     }
                 }
                 else
                 {
-                    await jS.ShowAlert("Captcha has been expired, please reload the page!");
+                    await ToastObj.Show(new ToastModel { Title = "Error!", Content = "Captcha has been expired, please reload the page!", CssClass = "e-toast-danger", Icon = "e-error toast-icons" });
+                    await Task.Delay(TimeSpan.FromSeconds(2));
                     navigationManager.NavigateTo("Login", true);
                 }
             }
             catch (HttpRequestException e)
             {
                 Loader = "none";
-                await jS.ShowAlert(e.Message + " or Reload the page!");
+                await ToastObj.Show(new ToastModel { Title = "Error!", Content = $"{e.Message} or Reload the page!", CssClass = "e-toast-danger", Icon = "e-error toast-icons" });
+                await Task.Delay(TimeSpan.FromSeconds(2));
                 ServerVerificatiing = false;
                 navigationManager.NavigateTo("Login", true);
             }

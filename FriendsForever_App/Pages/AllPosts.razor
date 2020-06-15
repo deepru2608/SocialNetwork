@@ -22,12 +22,12 @@
                             <h4>@post.PostedOwnerName</h4>
                         </div>
                         <div class="ml-auto p-2">
-                            <span class="text-right">@((DateTime.Now - post.PostedTimeStamp).Minutes) mins</span>
+                            <span class="text-right">@( DateTime.Now.Subtract(post.PostedTimeStamp).Minutes ) mins</span>
                         </div>
                     </div>
                     <hr class="bg-secondary" />
                     <p>@post.PostedContent</p>
-                    <div class="scrollOptions-Post" @onclick="showPhotosInModel">
+                    <div class="scrollOptions-Post">
                         @foreach (var images in allPhotos)
                         {
                             var photoPath = (images.PostedPhoto ?? "Microsoft_Default.png");
@@ -88,7 +88,7 @@
                             <h4>@post.PostedOwnerName</h4>
                         </div>
                         <div class="ml-auto p-2">
-                            <span class="text-right">@((DateTime.Now - post.PostedTimeStamp).Minutes) mins</span>
+                            <span class="text-right">@( DateTime.Now.Subtract(post.PostedTimeStamp).Minutes ) mins</span>
                         </div>
                     </div>
                     <hr class="bg-secondary" />
@@ -128,108 +128,6 @@ else
 <SfToast @ref="ToastObj" ID="toast_type">
     <ToastPosition X="Right"></ToastPosition>
 </SfToast>
-
-<!-- Modal: modalCart -->
-<div class="modal fade" id="modalCart" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-     aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <!--Header-->
-            <div class="modal-header">
-                <h4 class="modal-title" id="myModalLabel">All Photos</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">×</span>
-                </button>
-            </div>
-            <!--Body-->
-            <div class="modal-body">
-                <!--Carousel Wrapper-->
-                <div id="carousel-example-1z" class="carousel slide carousel-fade" data-ride="carousel">
-                    <!--Slides-->
-                    <div class="carousel-inner" role="listbox">
-                        @{ bool checkFirstCarousal = true; }
-                        @foreach (var images in AllPhotos)
-                        {
-                            var photoPath = (images.PostedPhoto ?? "Microsoft_Default.png");
-                            string[] checkContent = photoPath.Split('.');
-                            if (checkFirstCarousal)
-                            {
-                                <div class="carousel-item active">
-                                    @if (checkContent[checkContent.Length - 1].ToLower() == "png" || checkContent[checkContent.Length - 1].ToLower() == "jpg"
-                                        || checkContent[checkContent.Length - 1].ToLower() == "jpeg" || checkContent[checkContent.Length - 1].ToLower() == "gif")
-                                    {
-                                        <img src="Images/ProfileImage/@photoPath" style="width:100%" alt="@checkContent[0]" class="d-block w-100">   
-                                    }
-                                    else if (checkContent[checkContent.Length - 1].ToLower() == "mp4" || checkContent[checkContent.Length - 1].ToLower() == "m4v"
-                                        || checkContent[checkContent.Length - 1].ToLower() == "m4v" || checkContent[checkContent.Length - 1].ToLower() == "mov")
-                                    {
-                                        <video controls>
-                                            <source src="Images/PostImages/@photoPath" type="video/@checkContent[checkContent.Length - 1].ToLower()">
-                                            Your browser does not support the video tag.
-                                        </video>
-                                    }
-                                    else if (checkContent[checkContent.Length - 1].ToLower() == "mp3" || checkContent[checkContent.Length - 1].ToLower() == "wav"
-                                        || checkContent[checkContent.Length - 1].ToLower() == "aac")
-                                    {
-                                        <audio controls>
-                                                <source src="Images/PostImages/@photoPath" type="audio/@checkContent[checkContent.Length - 1].ToLower()">
-                                            Your browser does not support the audio element.
-                                        </audio>
-                                    }
-                                </div>
-
-                                checkFirstCarousal = false;
-                            }
-                            else
-                            {
-                                <div class="carousel-item active">
-                                    @if (checkContent[checkContent.Length - 1].ToLower() == "png" || checkContent[checkContent.Length - 1].ToLower() == "jpg"
-                                        || checkContent[checkContent.Length - 1].ToLower() == "jpeg" || checkContent[checkContent.Length - 1].ToLower() == "gif")
-                                    {
-                                        <img src="Images/ProfileImage/@photoPath" style="width:100%" alt="@checkContent[0]" class="d-block w-100">   
-                                    }
-                                    else if (checkContent[checkContent.Length - 1].ToLower() == "mp4" || checkContent[checkContent.Length - 1].ToLower() == "m4v"
-                                        || checkContent[checkContent.Length - 1].ToLower() == "m4v" || checkContent[checkContent.Length - 1].ToLower() == "mov")
-                                    {
-                                        <video controls>
-                                            <source src="Images/PostImages/@photoPath" type="video/@checkContent[checkContent.Length - 1].ToLower()">
-                                            Your browser does not support the video tag.
-                                        </video>
-                                    }
-                                    else if (checkContent[checkContent.Length - 1].ToLower() == "mp3" || checkContent[checkContent.Length - 1].ToLower() == "wav"
-                                        || checkContent[checkContent.Length - 1].ToLower() == "aac")
-                                    {
-                                        <audio controls>
-                                                <source src="Images/PostImages/@photoPath" type="audio/@checkContent[checkContent.Length - 1].ToLower()">
-                                            Your browser does not support the audio element.
-                                        </audio>
-                                    }
-                                </div>
-                            }
-                        }
-                    </div>
-                    <!--Slides-->
-                    <!--Controls-->
-                    <a class="carousel-control-prev" href="#carousel-example-1z" role="button" data-slide="prev">
-                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                        <span class="sr-only">Previous</span>
-                    </a>
-                    <a class="carousel-control-next" href="#carousel-example-1z" role="button" data-slide="next">
-                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                        <span class="sr-only">Next</span>
-                    </a>
-                    <!--Controls-->
-                </div>
-                <!--Carousel Wrapper-->
-            </div>
-            <!--Footer-->
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline-primary" data-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
-<!-- Modal: modalCart -->
 
 @code {
     SfToast ToastObj;
@@ -277,7 +175,7 @@ else
         }
     }
 
-    private async Task InsertLikes(string postId)
+    async Task InsertLikes(string postId)
     {
         var user = await userService.GetUserDetailsAsync();
         var duplicateLikes = new DuplicateLikesViewModel()
@@ -304,7 +202,19 @@ else
                 var likeUpdation = await centerService.UpdatePostMasterLikesAsync(postId);
                 if (likeUpdation > 0)
                 {
-                    StateHasChanged();
+                    await ToastObj.Show(new ToastModel { Title = "Success!", Content = "Like updated successfully.", CssClass = "e-toast-success", Icon = "e-success toast-icons" });
+                    var post = await centerService.FindPostDetailsByIdAsync(postId);
+                    if (post != null)
+                    {
+                        foreach (var postData in AllPostsList)
+                        {
+                            if (postData.PostedId == post.PostedId)
+                            {
+                                postData.LikesCount = post.LikesCount;
+                                postData.CommentsCount = post.CommentsCount;
+                            }
+                        }
+                    }
                 }
                 else
                 {
@@ -316,16 +226,14 @@ else
                 await ToastObj.Show(new ToastModel { Title = "Error!", Content = "Invalid request, please try after sometimes!", CssClass = "e-toast-danger", Icon = "e-error toast-icons" });
             }
         }
+
+        await Task.Delay(TimeSpan.FromSeconds(2));
+        navigationManager.NavigateTo("/", true);
+        StateHasChanged();
     }
 
-    public async Task RouteOnCommendBox(string postId)
+    void RouteOnCommendBox(string postId)
     {
-        await protectedSessionStorage.SetAsync("postId", postId);
-        navigationManager.NavigateTo($"Home/CommentBox", true);
-    }
-
-    async Task showPhotosInModel()
-    {
-        await jS.ShowModel("modalCart");
+        navigationManager.NavigateTo(Path.Combine(nameof(CommentBox), postId), true);
     }
 }

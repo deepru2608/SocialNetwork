@@ -114,7 +114,7 @@ namespace FriendsForever_Api.Controllers
 
         [HttpGet]
         [Route("GetAllFriendsAsync")]
-        public async Task<ActionResult<IEnumerable<ShowAllFriend>>> GetAllFriendsAsync(string userId)
+        public async Task<ActionResult<IEnumerable<ShowAllFriend>>> GetAllFriendsAsync([FromBody] string userId)
         {
             var result = await dbContext.FriendsMaster
                 .Where(w => w.UserIdRequest == userId && w.Status == "Accept")
@@ -139,7 +139,7 @@ namespace FriendsForever_Api.Controllers
 
         [HttpGet]
         [Route("GetNewFriendsRequestAsync")]
-        public async Task<ActionResult<IEnumerable<ShowFriendsReuqestData>>> GetNewFriendsRequestAsync(string userId)
+        public async Task<ActionResult<IEnumerable<ShowFriendsReuqestData>>> GetNewFriendsRequestAsync([FromBody] string userId)
         {
             var result = await dbContext.FriendsMaster
                 .Where(w => w.UserIdResponse == userId && w.Status == "Pending")
@@ -182,7 +182,7 @@ namespace FriendsForever_Api.Controllers
         [Route("InsertFriendsReuqestDataAsync")]
         public async Task<ActionResult<int>> InsertFriendsReuqestDataAsync(Friends friends)
         {
-            dbContext.FriendsMaster.Add(friends);
+            await dbContext.FriendsMaster.AddAsync(friends);
             return await dbContext.SaveChangesAsync();
         }
 
@@ -254,16 +254,24 @@ namespace FriendsForever_Api.Controllers
 
         [HttpPost]
         [Route("UpdatePostMasterLikesAsync")]
-        public async Task<ActionResult<int>> UpdatePostMasterLikesAsync(string postId)
+        public async Task<ActionResult<int>> UpdatePostMasterLikesAsync([FromBody] string postId)
         {
-            var post = await dbContext.PostMaster.FirstOrDefaultAsync(f => f.PostedId == postId);
-            var likeCount = await dbContext.LikesMaster.Where(w => w.PostedId == postId).CountAsync();
-            if (post != null)
+            int result = 0;
+            try
             {
-                post.LikesCount = likeCount;
-                dbContext.Update(post).Property(p => p.Id).IsModified = false;
+                var post = await dbContext.PostMaster.FirstOrDefaultAsync(f => f.PostedId == postId);
+                var likeCount = await dbContext.LikesMaster.Where(w => w.PostedId == postId).CountAsync();
+                if (post != null)
+                {
+                    post.LikesCount = likeCount;
+                    result = await dbContext.SaveChangesAsync();
+                    return result;
+                }
             }
-            var result = await dbContext.SaveChangesAsync();
+            catch (Exception ex)
+            {
+                string data = ex.Message;
+            }
             return result;
         }
 
@@ -281,6 +289,80 @@ namespace FriendsForever_Api.Controllers
         {
             await dbContext.PostImagesMaster.AddAsync(postImages);
             return await dbContext.SaveChangesAsync();
+        }
+
+        [HttpPost]
+        [Route("FindAllProfilePhotosAsync")]
+        public async Task<ActionResult<IEnumerable<string>>> FindAllProfilePhotosAsync([FromBody] string userId)
+        {
+            var result = from post in await dbContext.PostMaster.ToListAsync()
+                         join postImages in await dbContext.PostImagesMaster.ToListAsync() on post.PostedId equals postImages.PostedId
+                         where post.PostedOwnerUserId == userId
+                         select new
+                         {
+                             allImages = postImages.PostedPhoto
+                         };
+            List<string> li = new List<string>();
+            foreach (var images in result)
+            {
+                li.Add(images.allImages);
+            }
+            return li;
+        }
+
+        [HttpPost]
+        [Route("CheckFriendRequestSentOrNotAsync")]
+        public async Task<ActionResult<bool>> CheckFriendRequestSentOrNotAsync(CheckFriendRequestStatusViewModel model)
+        {
+            bool check = true;
+            var result = await dbContext.FriendsMaster
+                .Where(w => w.UserIdRequest == model.SenderId && w.UserIdResponse == model.RequestId && (w.Status == "Pending" || w.Status == "Accept"))
+                .CountAsync();
+            if (result > 0)
+            {
+                check = false;
+            }
+            return check;
+        }
+
+        [HttpPost]
+        [Route("FindPostDetailsByIdAsync")]
+        public async Task<ActionResult<Post>> FindPostDetailsByIdAsync([FromBody] string postId)
+        {
+            return await dbContext.PostMaster.FirstOrDefaultAsync(f => f.PostedId == postId);
+        }
+
+        [HttpPost]
+        [Route("GetCommentsListByPostIdAsync")]
+        public async Task<ActionResult<IEnumerable<Comments>>> GetCommentsListByPostIdAsync([FromBody] string postId)
+        {
+            return await dbContext.CommentsMaster.Where(w => w.PostedId == postId).ToListAsync();
+        }
+
+        [HttpPost]
+        [Route("InsertPostCommentsAsync")]
+        [AllowAnonymous]
+        public async Task<ActionResult<int>> InsertPostCommentsAsync([FromBody] Comments comment)
+        {
+            await dbContext.CommentsMaster.AddAsync(comment);
+            return await dbContext.SaveChangesAsync();
+        }
+
+        [HttpPost]
+        [Route("UpdatePostMasterCommentsAsync")]
+        [AllowAnonymous]
+        public async Task<ActionResult<int>> UpdatePostMasterCommentsAsync([FromBody] string postId)
+        {
+            int result = 0;
+            var post = await dbContext.PostMaster.FirstOrDefaultAsync(f => f.PostedId == postId);
+            var commentCount = await dbContext.CommentsMaster.Where(w => w.PostedId == postId).CountAsync();
+            if (post != null)
+            {
+                post.CommentsCount = commentCount;
+                result = await dbContext.SaveChangesAsync();
+                return result;
+            }
+            return result;
         }
     }
 }

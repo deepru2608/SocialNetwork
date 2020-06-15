@@ -148,10 +148,13 @@ namespace FriendsForever_App.Services
             return "Failure";
         }
 
-        public async Task<IEnumerable<SearchNewFriendViewModel>> SearchNewFriendsAsync()
+        public async Task<IEnumerable<SearchNewFriendViewModel>> SearchNewFriendsAsync(string userId)
         {
             string token = await protectedLocalStorage.GetAsync<string>(TokenKey);
-            var requestMessage = new HttpRequestMessage(HttpMethod.Get, "SearchNewFriendsAsync");
+            string serializedData = JsonConvert.SerializeObject(userId);
+            var requestMessage = new HttpRequestMessage(HttpMethod.Post, "SearchNewFriendsAsync");
+            requestMessage.Content = new StringContent(serializedData);
+            requestMessage.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
             requestMessage.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
             var response = await httpClient.SendAsync(requestMessage);
             IEnumerable<SearchNewFriendViewModel> model = new List<SearchNewFriendViewModel>();
@@ -162,6 +165,26 @@ namespace FriendsForever_App.Services
             }
 
             return model;
+        }
+
+        public async Task<ApplicationUser> GetUserByIdAsync(string userId)
+        {
+            string token = await protectedLocalStorage.GetAsync<string>(TokenKey);
+            string serializedData = JsonConvert.SerializeObject(userId);
+            var requestMessage = new HttpRequestMessage(HttpMethod.Post, "GetUserByIdAsync");
+            requestMessage.Content = new StringContent(serializedData);
+            requestMessage.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+            requestMessage.Headers.Authorization = new AuthenticationHeaderValue("bearer", token);
+            var response = await httpClient.SendAsync(requestMessage);
+            if (response.IsSuccessStatusCode)
+            {
+                var responseData = await response.Content.ReadAsStringAsync();
+                var user = JsonConvert.DeserializeObject<ApplicationUser>(responseData);
+                return user;
+            }
+
+            ApplicationUser otherUser = null;
+            return otherUser;
         }
     }
 }
